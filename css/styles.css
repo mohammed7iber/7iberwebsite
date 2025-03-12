@@ -1,0 +1,190 @@
+/* Print Shop Management System Styles */
+
+/* Sidebar styles */
+.sidebar {
+    height: 100vh;
+    background-color: #343a40;
+    padding-top: 20px;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #495057;
+    transform: translateX(5px);
+}
+
+.sidebar a.active {
+    background-color: #0d6efd;
+    border-left: 4px solid #fff;
+}
+
+/* Content area */
+.content {
+    padding: 20px;
+}
+
+/* Form sections */
+.form-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-section.active {
+    display: block;
+}
+
+/* Tables */
+#clientTable, #ordersTable {
+    width: 100%;
+}
+
+/* Card styling */
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Form controls */
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+/* Modal styling */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Invoice and quote preview styling */
+.invoice-preview, .quote-preview {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+/* Status badges */
+.badge {
+    padding: 6px 10px;
+    font-weight: normal;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Print specific styles */
+@media print {
+    .sidebar, .modal-header, .modal-footer, .no-print {
+        display: none !important;
+    }
+    
+    .modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        overflow: visible !important;
+    }
+    
+    .modal-dialog {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+    
+    .modal-content {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .invoice-preview, .quote-preview {
+        border: none;
+        padding: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        height: auto;
+        position: relative;
+    }
+    
+    .content {
+        margin-top: 20px;
+    }
+}
