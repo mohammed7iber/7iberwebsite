@@ -41,7 +41,49 @@ function loadClientTable() {
 }
 
 // Save client
-
+document.getElementById('saveClientBtn').addEventListener('click', function() {
+    const clientId = document.getElementById('clientForm')?.getAttribute('data-id');
+    
+    const client = {
+        id: clientId || generateId(),
+        name: document.getElementById('clientName').value,
+        contactPerson: document.getElementById('contactPerson').value,
+        email: document.getElementById('clientEmail').value,
+        phone: document.getElementById('clientPhone').value,
+        location: document.getElementById('clientLocation').value,
+        notes: document.getElementById('clientNotes').value,
+        createdAt: clientId ? (clients.find(c => c.id === clientId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    if (clientId) {
+        // Update existing client
+        const index = clients.findIndex(c => c.id === clientId);
+        if (index !== -1) {
+            clients[index] = client;
+        }
+    } else {
+        // Add new client
+        clients.push(client);
+    }
+    
+    // Save to local storage
+    localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+    
+    // Close modal and refresh table
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
+    modal.hide();
+    
+    // Reset form
+    document.getElementById('addClientForm').reset();
+    if (document.getElementById('clientForm')) {
+        document.getElementById('clientForm').removeAttribute('data-id');
+    }
+    
+    // Refresh table
+    loadClientTable();
+    updateDashboard();
+});
 
 // Edit client
 function editClient(clientId) {
