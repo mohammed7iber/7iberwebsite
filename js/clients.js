@@ -42,19 +42,7 @@ function loadClientTable() {
 
 // Save client
 document.getElementById('saveClientBtn').addEventListener('click', function() {
-    const clientId = document.getElementById('clientForm')?.getAttribute('data-id');
-    
-    const client = {
-        id: clientId || generateId(),
-        name: document.getElementById('clientName').value,
-        contactPerson: document.getElementById('contactPerson').value,
-        email: document.getElementById('clientEmail').value,
-        phone: document.getElementById('clientPhone').value,
-        location: document.getElementById('clientLocation').value,
-        notes: document.getElementById('clientNotes').value,
-        createdAt: clientId ? (clients.find(c => c.id === clientId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    };
+
     
     if (clientId) {
         // Update existing client
