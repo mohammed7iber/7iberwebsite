@@ -41,37 +41,7 @@ function loadClientTable() {
 }
 
 // Save client
-document.getElementById('saveClientBtn').addEventListener('click', function() {
 
-    
-    if (clientId) {
-        // Update existing client
-        const index = clients.findIndex(c => c.id === clientId);
-        if (index !== -1) {
-            clients[index] = client;
-        }
-    } else {
-        // Add new client
-        clients.push(client);
-    }
-    
-    // Save to local storage
-    localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
-    
-    // Close modal and refresh table
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
-    modal.hide();
-    
-    // Reset form
-    document.getElementById('addClientForm').reset();
-    if (document.getElementById('clientForm')) {
-        document.getElementById('clientForm').removeAttribute('data-id');
-    }
-    
-    // Refresh table
-    loadClientTable();
-    updateDashboard();
-});
 
 // Edit client
 function editClient(clientId) {
