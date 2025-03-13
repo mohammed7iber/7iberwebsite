@@ -53,517 +53,486 @@
             
             <!-- Main Content Area -->
             <div class="col-md-10 content">
-<!-- Dashboard Section -->
-<div id="dashboard" class="form-section active">
-    <h2>Dashboard</h2>
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Clients</h5>
-                    <p class="card-text display-4" id="totalClients">0</p>
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="form-section active">
+                    <h2>Dashboard</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Clients</h5>
+                                    <p class="card-text display-4" id="totalClients">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active Orders</h5>
+                                    <p class="card-text display-4" id="activeOrders">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Quotes</h5>
+                                    <p class="card-text display-4" id="pendingQuotes">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-danger">
+                                <div class="card-body">
+                                    <h5 class="card-title">Unpaid Invoices</h5>
+                                    <p class="card-text display-4" id="unpaidInvoices">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Recent Orders
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Client</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentOrdersTable">
+                                            <!-- Will be populated with JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Recent Clients
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Contact</th>
+                                                <th>Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentClientsTable">
+                                            <!-- Will be populated with JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Active Orders</h5>
-                    <p class="card-text display-4" id="activeOrders">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Quotes</h5>
-                    <p class="card-text display-4" id="pendingQuotes">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Unpaid Invoices</h5>
-                    <p class="card-text display-4" id="unpaidInvoices">0</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    Recent Orders
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Client</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentOrdersTable">
-                            <!-- Will be populated with JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    Recent Clients
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentClientsTable">
-                            <!-- Will be populated with JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Dashboard Section -->
-<div id="dashboard" class="form-section active">
-    <h2>Dashboard</h2>
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Clients</h5>
-                    <p class="card-text display-4" id="totalClients">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Active Orders</h5>
-                    <p class="card-text display-4" id="activeOrders">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Quotes</h5>
-                    <p class="card-text display-4" id="pendingQuotes">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Unpaid Invoices</h5>
-                    <p class="card-text display-4" id="unpaidInvoices">0</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    Recent Orders
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Client</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentOrdersTable">
-                            <!-- Will be populated with JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    Recent Clients
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentClientsTable">
-                            <!-- Will be populated with JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Quotes Section -->
-<div id="quotes" class="form-section">
-    <h2>Quotes Management</h2>
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createQuoteModal">Create New Quote</button>
-    
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Quote ID</th>
-                        <th>Client</th>
-                        <th>Date Created</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="quotesTableBody">
-                    <!-- Will be populated with JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Invoices Section -->
-<div id="invoices" class="form-section">
-    <h2>Invoices Management</h2>
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">Create New Invoice</button>
-    
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Invoice ID</th>
-                        <th>Client</th>
-                        <th>Date Created</th>
-                        <th>Due Date</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="invoicesTableBody">
-                    <!-- Will be populated with JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<!-- Settings Section -->
-<div id="settings" class="form-section">
-    <h2>System Settings</h2>
-    
-    <div class="card">
-        <div class="card-body">
-            <form id="settingsForm">
-                <div class="mb-3">
-                    <h4>Business Information</h4>
-                </div>
-                <div class="mb-3">
-                    <label for="businessName" class="form-label">Business Name</label>
-                    <input type="text" class="form-control" id="businessName">
-                </div>
-                <div class="mb-3">
-                    <label for="businessAddress" class="form-label">Business Address</label>
-                    <textarea class="form-control" id="businessAddress" rows="3"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="businessPhone" class="form-label">Business Phone</label>
-                    <input type="text" class="form-control" id="businessPhone">
-                </div>
-                <div class="mb-3">
-                    <label for="businessEmail" class="form-label">Business Email</label>
-                    <input type="email" class="form-control" id="businessEmail">
+                <!-- Clients Section -->
+                <div id="clients" class="form-section">
+                    <h2>Clients Management</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addClientModal">Add New Client</button>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="clientTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Contact Person</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientTableBody">
+                                    <!-- Will be populated with JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="mb-3 mt-4">
-                    <h4>Print Services</h4>
+                <!-- Orders Section -->
+                <div id="orders" class="form-section">
+                    <h2>Orders Management</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addOrderModal">Create New Order</button>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <table id="ordersTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Client</th>
+                                        <th>Description</th>
+                                        <th>Dimensions</th>
+                                        <th>Status</th>
+                                        <th>Due Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody">
+                                    <!-- Will be populated with JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div id="printServices">
-                    <div class="row mb-2 print-service-row">
-                        <div class="col-md-5">
-                            <input type="text" class="form-control" placeholder="Service Name (e.g., Banner Printing)">
+                <!-- Quotes Section -->
+                <div id="quotes" class="form-section">
+                    <h2>Quotes Management</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createQuoteModal">Create New Quote</button>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Quote ID</th>
+                                        <th>Client</th>
+                                        <th>Date Created</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quotesTableBody">
+                                    <!-- Will be populated with JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-md-3">
-                            <input type="number" class="form-control" placeholder="Base Price">
+                    </div>
+                </div>
+                
+                <!-- Invoices Section -->
+                <div id="invoices" class="form-section">
+                    <h2>Invoices Management</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">Create New Invoice</button>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice ID</th>
+                                        <th>Client</th>
+                                        <th>Date Created</th>
+                                        <th>Due Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoicesTableBody">
+                                    <!-- Will be populated with JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-md-3">
-                            <select class="form-select">
-                                <option>Per Item</option>
-                                <option>Per Square Foot</option>
-                                <option>Per Square Meter</option>
-                                <option>Per Hour</option>
+                    </div>
+                </div>
+                <!-- Settings Section -->
+                <div id="settings" class="form-section">
+                    <h2>System Settings</h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="settingsForm">
+                                <div class="mb-3">
+                                    <h4>Business Information</h4>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="businessName" class="form-label">Business Name</label>
+                                    <input type="text" class="form-control" id="businessName">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="businessAddress" class="form-label">Business Address</label>
+                                    <textarea class="form-control" id="businessAddress" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="businessPhone" class="form-label">Business Phone</label>
+                                    <input type="text" class="form-control" id="businessPhone">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="businessEmail" class="form-label">Business Email</label>
+                                    <input type="email" class="form-control" id="businessEmail">
+                                </div>
+                                
+                                <div class="mb-3 mt-4">
+                                    <h4>Print Services</h4>
+                                </div>
+                                <div id="printServices">
+                                    <div class="row mb-2 print-service-row">
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" placeholder="Service Name (e.g., Banner Printing)">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" placeholder="Base Price">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select">
+                                                <option>Per Item</option>
+                                                <option>Per Square Foot</option>
+                                                <option>Per Square Meter</option>
+                                                <option>Per Hour</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger remove-service">×</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-secondary mt-2" id="addServiceBtn">Add Service</button>
+                                
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add Client Modal -->
+    <div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClientForm">
+                        <div class="mb-3">
+                            <label for="clientName" class="form-label">Client Name/Company</label>
+                            <input type="text" class="form-control" id="clientName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactPerson" class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="contactPerson">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="clientEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="clientPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientLocation" class="form-label">Location/Address</label>
+                            <textarea class="form-control" id="clientLocation" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="clientNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Order Modal -->
+    <div class="modal fade" id="addOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addOrderForm">
+                        <div class="mb-3">
+                            <label for="orderClient" class="form-label">Client</label>
+                            <select class="form-select" id="orderClient" required>
+                                <option value="">Select Client</option>
+                                <!-- Will be populated with JavaScript -->
                             </select>
                         </div>
-                        <div class="col-md-1">
-                            <button type="button" class="btn btn-danger remove-service">×</button>
+                        <div class="mb-3">
+                            <label for="orderDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="orderDescription" rows="2" required></textarea>
                         </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary mt-2" id="addServiceBtn">Add Service</button>
-                
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Save Settings</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-</div>
-</div>
-</div>
-<!-- Add Client Modal -->
-<div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Client</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addClientForm">
-                    <div class="mb-3">
-                        <label for="clientName" class="form-label">Client Name/Company</label>
-                        <input type="text" class="form-control" id="clientName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactPerson" class="form-label">Contact Person</label>
-                        <input type="text" class="form-control" id="contactPerson">
-                    </div>
-                    <div class="mb-3">
-                        <label for="clientEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="clientEmail">
-                    </div>
-                    <div class="mb-3">
-                        <label for="clientPhone" class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="clientPhone">
-                    </div>
-                    <div class="mb-3">
-                        <label for="clientLocation" class="form-label">Location/Address</label>
-                        <textarea class="form-control" id="clientLocation" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="clientNotes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="clientNotes" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Order Modal -->
-<div class="modal fade" id="addOrderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create New Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addOrderForm">
-                    <div class="mb-3">
-                        <label for="orderClient" class="form-label">Client</label>
-                        <select class="form-select" id="orderClient" required>
-                            <option value="">Select Client</option>
-                            <!-- Will be populated with JavaScript -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="orderDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="orderDescription" rows="2" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Print Specifications</label>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="printWidth" class="form-label">Width</label>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="printWidth" step="0.01">
-                                    <select class="form-select" id="widthUnit">
-                                        <option value="in">inches</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">meters</option>
-                                        <option value="ft">feet</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="printHeight" class="form-label">Height</label>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" id="printHeight" step="0.01">
-                                    <select class="form-select" id="heightUnit">
-                                        <option value="in">inches</option>
-                                        <option value="cm">cm</option>
-                                        <option value="m">meters</option>
-                                        <option value="ft">feet</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="printQuantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="printQuantity" value="1" min="1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="printType" class="form-label">Print Type</label>
-                        <select class="form-select" id="printType">
-                            <option value="">Select Print Type</option>
-                            <option>Banner</option>
-                            <option>Poster</option>
-                            <option>Flyer</option>
-                            <option>Business Card</option>
-                            <option>Brochure</option>
-                            <option>Custom</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="printMaterial" class="form-label">Material</label>
-                        <select class="form-select" id="printMaterial">
-                            <option value="">Select Material</option>
-                            <option>Vinyl</option>
-                            <option>Glossy Paper</option>
-                            <option>Matte Paper</option>
-                            <option>Card Stock</option>
-                            <option>Canvas</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="dueDate" class="form-label">Due Date</label>
-                        <input type="date" class="form-control" id="dueDate">
-                    </div>
-                    <div class="mb-3">
-                        <label for="orderNotes" class="form-label">Additional Notes</label>
-                        <textarea class="form-control" id="orderNotes" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" id="createQuoteFromOrderBtn">Create Quote</button>
-                <button type="button" class="btn btn-primary" id="saveOrderBtn">Save Order</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Create Quote Modal -->
-<div class="modal fade" id="createQuoteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Quote</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createQuoteForm">
-                    <div class="mb-3">
-                        <label for="quoteClient" class="form-label">Client</label>
-                        <select class="form-select" id="quoteClient" required>
-                            <option value="">Select Client</option>
-                            <!-- Will be populated with JavaScript -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="quoteOrder" class="form-label">Based on Order (Optional)</label>
-                        <select class="form-select" id="quoteOrder">
-                            <option value="">Select Order or Leave Empty for New Quote</option>
-                            <!-- Will be populated with JavaScript -->
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Quote Items</label>
-                        <div id="quoteItems">
-                            <div class="row mb-2 quote-item-row">
+                        <div class="mb-3">
+                            <label class="form-label">Print Specifications</label>
+                            <div class="row">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control item-description" placeholder="Item Description" required>
+                                    <label for="printWidth" class="form-label">Width</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" id="printWidth" step="0.01">
+                                        <select class="form-select" id="widthUnit">
+                                            <option value="in">inches</option>
+                                            <option value="cm">cm</option>
+                                            <option value="m">meters</option>
+                                            <option value="ft">feet</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" class="form-control item-quantity" placeholder="Qty" min="1" value="1" required>
+                                <div class="col-md-4">
+                                    <label for="printHeight" class="form-label">Height</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" id="printHeight" step="0.01">
+                                        <select class="form-select" id="heightUnit">
+                                            <option value="in">inches</option>
+                                            <option value="cm">cm</option>
+                                            <option value="m">meters</option>
+                                            <option value="ft">feet</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" step="0.01" class="form-control item-price" placeholder="Unit Price" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <input type="number" step="0.01" class="form-control item-total" placeholder="Total" readonly>
-                                </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-danger remove-item">×</button>
+                                <div class="col-md-4">
+                                    <label for="printQuantity" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="printQuantity" value="1" min="1">
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-secondary mt-2" id="addQuoteItemBtn">Add Item</button>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-8"></div>
-                        <div class="col-md-4">
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">Subtotal</span>
-                                <input type="text" class="form-control" id="quoteSubtotal" readonly>
-                            </div>
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">Tax (%)</span>
-                                <input type="number" class="form-control" id="quoteTaxRate" value="0" min="0" max="100">
-                            </div>
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">Tax Amount</span>
-                                <input type="text" class="form-control" id="quoteTaxAmount" readonly>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-text">Total</span>
-                                <input type="text" class="form-control" id="quoteTotal" readonly>
-                            </div>
+                        <div class="mb-3">
+                            <label for="printType" class="form-label">Print Type</label>
+                            <select class="form-select" id="printType">
+                                <option value="">Select Print Type</option>
+                                <option>Banner</option>
+                                <option>Poster</option>
+                                <option>Flyer</option>
+                                <option>Business Card</option>
+                                <option>Brochure</option>
+                                <option>Custom</option>
+                            </select>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="quoteNotes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="quoteNotes" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="quoteValidUntil" class="form-label">Valid Until</label>
-                        <input type="date" class="form-control" id="quoteValidUntil">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveQuoteBtn">Save Quote</button>
-                <button type="button" class="btn btn-success" id="previewQuoteBtn">Preview Quote</button>
+                        <div class="mb-3">
+                            <label for="printMaterial" class="form-label">Material</label>
+                            <select class="form-select" id="printMaterial">
+                                <option value="">Select Material</option>
+                                <option>Vinyl</option>
+                                <option>Glossy Paper</option>
+                                <option>Matte Paper</option>
+                                <option>Card Stock</option>
+                                <option>Canvas</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="dueDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="orderNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="orderNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="createQuoteFromOrderBtn">Create Quote</button>
+                    <button type="button" class="btn btn-primary" id="saveOrderBtn">Save Order</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Create Invoice Modal -->
+    <!-- Create Quote Modal -->
+    <div class="modal fade" id="createQuoteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Quote</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createQuoteForm">
+                        <div class="mb-3">
+                            <label for="quoteClient" class="form-label">Client</label>
+                            <select class="form-select" id="quoteClient" required>
+                                <option value="">Select Client</option>
+                                <!-- Will be populated with JavaScript -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quoteOrder" class="form-label">Based on Order (Optional)</label>
+                            <select class="form-select" id="quoteOrder">
+                                <option value="">Select Order or Leave Empty for New Quote</option>
+                                <!-- Will be populated with JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Quote Items</label>
+                            <div id="quoteItems">
+                                <div class="row mb-2 quote-item-row">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control item-description" placeholder="Item Description" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control item-quantity" placeholder="Qty" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" step="0.01" class="form-control item-price" placeholder="Unit Price" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" step="0.01" class="form-control item-total" placeholder="Total" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger remove-item">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="addQuoteItemBtn">Add Item</button>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8"></div>
+                            <div class="col-md-4">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Subtotal</span>
+                                    <input type="text" class="form-control" id="quoteSubtotal" readonly>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Tax (%)</span>
+                                    <input type="number" class="form-control" id="quoteTaxRate" value="0" min="0" max="100">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">Tax Amount</span>
+                                    <input type="text" class="form-control" id="quoteTaxAmount" readonly>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text">Total</span>
+                                    <input type="text" class="form-control" id="quoteTotal" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quoteNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="quoteNotes" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quoteValidUntil" class="form-label">Valid Until</label>
+                            <input type="date" class="form-control" id="quoteValidUntil">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveQuoteBtn">Save Quote</button>
+                    <button type="button" class="btn btn-success" id="previewQuoteBtn">Preview Quote</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Invoice Modal -->
 <div class="modal fade" id="createInvoiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
