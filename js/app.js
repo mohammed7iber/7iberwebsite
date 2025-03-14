@@ -364,3 +364,186 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+// Function to clear stored data
+function clearStoredData(dataType) {
+    switch(dataType) {
+        case 'clients':
+            localStorage.removeItem(CLIENTS_KEY);
+            clients = [];
+            break;
+        case 'orders':
+            localStorage.removeItem(ORDERS_KEY);
+            orders = [];
+            break;
+        case 'quotes':
+            localStorage.removeItem(QUOTES_KEY);
+            quotes = [];
+            break;
+        case 'invoices':
+            localStorage.removeItem(INVOICES_KEY);
+            invoices = [];
+            break;
+        case 'price-lists':
+            localStorage.removeItem(PRICE_LISTS_KEY);
+            priceLists = {};
+            break;
+        case 'settings':
+            localStorage.removeItem(SETTINGS_KEY);
+            settings = {
+                businessName: 'My Print Shop',
+                businessAddress: '',
+                businessPhone: '',
+                businessEmail: '',
+                services: []
+            };
+            break;
+        case 'all':
+            localStorage.removeItem(CLIENTS_KEY);
+            localStorage.removeItem(ORDERS_KEY);
+            localStorage.removeItem(QUOTES_KEY);
+            localStorage.removeItem(INVOICES_KEY);
+            localStorage.removeItem(PRICE_LISTS_KEY);
+            localStorage.removeItem(SETTINGS_KEY);
+            
+            clients = [];
+            orders = [];
+            quotes = [];
+            invoices = [];
+            priceLists = {};
+            settings = {
+                businessName: 'My Print Shop',
+                businessAddress: '',
+                businessPhone: '',
+                businessEmail: '',
+                services: []
+            };
+            break;
+    }
+    
+    // Refresh UI
+    updateDashboard();
+    
+    // Reload current section
+    const activeSection = document.querySelector('.sidebar a.active');
+    if (activeSection) {
+        const sectionId = activeSection.getAttribute('data-section');
+        if (sectionId === 'dashboard') {
+            updateDashboard();
+        } else if (sectionId === 'clients') {
+            loadClientTable();
+        } else if (sectionId === 'orders') {
+            loadOrdersTable();
+        } else if (sectionId === 'quotes') {
+            loadQuotesTable();
+        } else if (sectionId === 'invoices') {
+            loadInvoicesTable();
+        } else if (sectionId === 'settings') {
+            loadSettings();
+        }
+    }
+}
+
+// Data management functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear data button
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    if (clearDataBtn) {
+        clearDataBtn.addEventListener('click', function() {
+            const dataType = document.getElementById('clearDataType').value;
+            const dataName = document.getElementById('clearDataType').options[document.getElementById('clearDataType').selectedIndex].text;
+            
+            // Confirm deletion
+            if (confirm(`Are you sure you want to clear all ${dataName}? This action cannot be undone.`)) {
+                clearStoredData(dataType);
+                alert(`${dataName} have been cleared.`);
+            }
+        });
+    }
+    
+    // Export data button
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', function() {
+            const exportData = {
+                clients: JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]'),
+                orders: JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'),
+                quotes: JSON.parse(localStorage.getItem(QUOTES_KEY) || '[]'),
+                invoices: JSON.parse(localStorage.getItem(INVOICES_KEY) || '[]'),
+                priceLists: JSON.parse(localStorage.getItem(PRICE_LISTS_KEY) || '{}'),
+                settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'print_shop_data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        });
+    }
+    
+    // Import data button
+    const importDataBtn = document.getElementById('importDataBtn');
+    const importDataFile = document.getElementById('importDataFile');
+    
+    if (importDataBtn && importDataFile) {
+        importDataBtn.addEventListener('click', function() {
+            importDataFile.click();
+        });
+        
+        importDataFile.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // Validate the data structure (basic validation)
+                        if (importedData.clients && importedData.orders && 
+                            importedData.quotes && importedData.invoices && 
+                            importedData.priceLists && importedData.settings) {
+                            
+                            if (confirm('This will replace all your current data. Continue?')) {
+                                // Store the imported data
+                                localStorage.setItem(CLIENTS_KEY, JSON.stringify(importedData.clients || []));
+                                localStorage.setItem(ORDERS_KEY, JSON.stringify(importedData.orders || []));
+                                localStorage.setItem(QUOTES_KEY, JSON.stringify(importedData.quotes || []));
+                                localStorage.setItem(INVOICES_KEY, JSON.stringify(importedData.invoices || []));
+                                localStorage.setItem(PRICE_LISTS_KEY, JSON.stringify(importedData.priceLists || {}));
+                                localStorage.setItem(SETTINGS_KEY, JSON.stringify(importedData.settings || {}));
+                                
+                                // Update the application state
+                                clients = importedData.clients || [];
+                                orders = importedData.orders || [];
+                                quotes = importedData.quotes || [];
+                                invoices = importedData.invoices || [];
+                                priceLists = importedData.priceLists || {};
+                                settings = importedData.settings || {};
+                                
+                                // Refresh UI
+                                updateDashboard();
+                                alert('Data imported successfully. The page will now reload.');
+                                location.reload();
+                            }
+                        } else {
+                            alert('Invalid data format. Please import a valid Print Shop backup file.');
+                        }
+                    } catch (err) {
+                        console.error('Error importing data:', err);
+                        alert('Error importing data. Please check the file format.');
+                    }
+                };
+                
+                reader.readAsText(file);
+                
+                // Reset the file input so the same file can be selected again
+                this.value = '';
+            }
+        });
+    }
+});

@@ -272,6 +272,44 @@
                             </form>
                         </div>
                     </div>
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h4>Data Management</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-danger">
+                                <strong>Warning:</strong> Clearing data cannot be undone. Please use with caution.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="clearDataType" class="form-label">Select Data to Clear</label>
+                                        <select class="form-select" id="clearDataType">
+                                            <option value="clients">Clients</option>
+                                            <option value="orders">Orders</option>
+                                            <option value="quotes">Quotes</option>
+                                            <option value="invoices">Invoices</option>
+                                            <option value="price-lists">Price Lists</option>
+                                            <option value="settings">Settings</option>
+                                            <option value="all">All Data</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-danger" id="clearDataBtn">Clear Selected Data</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Data Export/Import</label>
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-secondary" id="exportDataBtn">Export All Data</button>
+                                            <button type="button" class="btn btn-secondary" id="importDataBtn">Import Data</button>
+                                            <input type="file" id="importDataFile" accept=".json" style="display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
