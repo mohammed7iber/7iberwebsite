@@ -77,7 +77,10 @@ function getStatusColor(status) {
 
 // Format currency
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('ar-JO', { 
+        style: 'currency', 
+        currency: 'JOD'
+    }).format(amount);
 }
 
 // Navigation
