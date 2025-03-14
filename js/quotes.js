@@ -655,3 +655,252 @@ function populateQuoteDropdowns() {
         }
     });
 }
+
+// Update the createQuoteFromOrder function to use client pricing
+function createQuoteFromOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    // Show quote modal
+    const modal = new bootstrap.Modal(document.getElementById('createQuoteModal'));
+    modal.show();
+    
+    // Set client
+    document.getElementById('quoteClient').value = order.clientId;
+    
+    // Calculate area
+    const width = parseFloat(order.width);
+    const height = parseFloat(order.height);
+    let area = width * height;
+    let unit = 'sq ' + order.widthUnit;
+    
+    // Clear existing items
+    document.querySelectorAll('#quoteItems .quote-item-row').forEach((row, index) => {
+        if (index > 0) row.remove();
+    });
+    
+    // Add item
+    const itemRow = document.querySelector('#quoteItems .quote-item-row');
+    const itemDescription = `${order.printType} (${order.width}${order.widthUnit} × ${order.height}${order.heightUnit}) - ${order.material}`;
+    itemRow.querySelector('.item-description').value = itemDescription;
+    itemRow.querySelector('.item-quantity').value = order.quantity;
+    
+    // Set price based on client pricing if available
+    if (typeof getClientPrice === 'function') {
+        const pricing = getClientPrice(order.clientId, order.material);
+        if (pricing) {
+            let price = pricing.unitPrice;
+            
+            // Adjust price based on pricing method and dimensions
+            if (pricing.pricingMethod === 'Per Square Meter' || pricing.pricingMethod === 'Per Square Foot') {
+                // Convert measurements to the pricing unit if needed
+                let convertedArea = area;
+                
+                // Handle unit conversions (simplified)
+                if (order.widthUnit === 'in' && pricing.pricingMethod === 'Per Square Meter') {
+                    // Convert sq inches to sq meters
+                    convertedArea = area * 0.00064516;
+                } else if (order.widthUnit === 'cm' && pricing.pricingMethod === 'Per Square Meter') {
+                    // Convert sq cm to sq meters
+                    convertedArea = area * 0.0001;
+                } else if (order.widthUnit === 'ft' && pricing.pricingMethod === 'Per Square Meter') {
+                    // Convert sq feet to sq meters
+                    convertedArea = area * 0.092903;
+                } else if (order.widthUnit === 'm' && pricing.pricingMethod === 'Per Square Foot') {
+                    // Convert sq meters to sq feet
+                    convertedArea = area * 10.7639;
+                } else if (order.widthUnit === 'cm' && pricing.pricingMethod === 'Per Square Foot') {
+                    // Convert sq cm to sq feet
+                    convertedArea = area * 0.00107639;
+                } else if (order.widthUnit === 'in' && pricing.pricingMethod === 'Per Square Foot') {
+                    // Convert sq inches to sq feet
+                    convertedArea = area * 0.00694444;
+                }
+                
+                // Calculate total price based on area
+                price = price * convertedArea;
+            }
+            
+            itemRow.querySelector('.item-price').value = price.toFixed(2);
+        } else {
+            // Default price if no client pricing
+            const basePrice = 10; // Default price
+            itemRow.querySelector('.item-price').value = basePrice;
+        }
+    } else {
+        // Set a default price if client pricing is not available
+        const basePrice = 10; // Default price per sq unit
+        const price = basePrice; // Simplified pricing
+        
+        itemRow.querySelector('.item-price').value = price;
+    }
+    
+    itemRow.querySelector('.item-total').value = parseFloat(itemRow.querySelector('.item-price').value) * order.quantity;
+    
+    // Calculate totals
+    calculateQuoteTotals();
+    
+    // Set valid until date to 30 days from now
+    const validUntil = new Date();
+    validUntil.setDate(validUntil.getDate() + 30);
+    document.getElementById('quoteValidUntil').valueAsDate = validUntil;
+    
+    // Create quote
+    document.getElementById('createQuoteForm').setAttribute('data-order-id', orderId);
+}
+
+// Update the quote item price calculation
+document.addEventListener('DOMContentLoaded', function() {
+    // When creating a new quote manually
+    const quoteClientSelect = document.getElementById('quoteClient');
+    
+    // Add event listener to the "Add Item" button to use client pricing
+    const addQuoteItemBtn = document.getElementById('addQuoteItemBtn');
+    if (addQuoteItemBtn) {
+        const originalAddQuoteItem = addQuoteItemBtn.onclick || function() {};
+        
+        addQuoteItemBtn.onclick = function(e) {
+            // Call the original function first
+            originalAddQuoteItem.call(this, e);
+            
+            // Now add custom behavior to the newly added row
+            const newRow = document.querySelector('#quoteItems .quote-item-row:last-child');
+            if (newRow) {
+                // Add material selection dropdown if not already there
+                if (!newRow.querySelector('.item-material')) {
+                    // Create a material selection dropdown
+                    const descCell = newRow.querySelector('.col-md-4');
+                    if (descCell) {
+                        const originalDescInput = descCell.innerHTML;
+                        
+                        // Replace with description + material dropdown
+                        descCell.innerHTML = `
+                            <div class="mb-2">
+                                <input type="text" class="form-control item-description" placeholder="Item Description" required>
+                            </div>
+                            <div class="d-flex">
+                                <select class="form-select item-material">
+                                    <option value="">Select Material</option>
+                                    <option value="Vinyl">Vinyl</option>
+                                    <option value="Glossy Paper">Glossy Paper</option>
+                                    <option value="Matte Paper">Matte Paper</option>
+                                    <option value="Card Stock">Card Stock</option>
+                                    <option value="Canvas">Canvas</option>
+                                    <option value="Banner Material">Banner Material</option>
+                                    <option value="Adhesive Vinyl">Adhesive Vinyl</option>
+                                    <option value="Fabric">Fabric</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        `;
+                        
+                        // Add event listener to the material dropdown
+                        const materialSelect = descCell.querySelector('.item-material');
+                        if (materialSelect) {
+                            materialSelect.addEventListener('change', function() {
+                                const clientId = quoteClientSelect.value;
+                                const material = this.value;
+                                
+                                if (clientId && material && typeof getClientPrice === 'function') {
+                                    const pricing = getClientPrice(clientId, material);
+                                    if (pricing) {
+                                        // Update the price input with client pricing
+                                        newRow.querySelector('.item-price').value = pricing.unitPrice;
+                                        
+                                        // Trigger price calculation
+                                        calculateQuoteTotals();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        };
+    }
+});
+
+// Add this to invoices.js
+
+// Update createInvoiceFromQuote to preserve pricing
+function createInvoiceFromQuote(quoteId) {
+    const quote = quotes.find(q => q.id === quoteId);
+    if (!quote) return;
+    
+    // Show invoice modal
+    const modal = new bootstrap.Modal(document.getElementById('createInvoiceModal'));
+    modal.show();
+    
+    // Set client
+    document.getElementById('invoiceClient').value = quote.clientId;
+    document.getElementById('invoiceQuote').value = quoteId;
+    
+    // Clear existing items except the first one
+    document.querySelectorAll('#invoiceItems .invoice-item-row').forEach((row, index) => {
+        if (index > 0) row.remove();
+    });
+    
+    // Populate items
+    if (quote.items && quote.items.length > 0) {
+        const firstItemRow = document.querySelector('#invoiceItems .invoice-item-row');
+        
+        // Set first item
+        firstItemRow.querySelector('.item-description').value = quote.items[0].description;
+        firstItemRow.querySelector('.item-quantity').value = quote.items[0].quantity;
+        firstItemRow.querySelector('.item-price').value = quote.items[0].price;
+        firstItemRow.querySelector('.item-total').value = quote.items[0].total;
+        
+        // Add additional items
+        for (let i = 1; i < quote.items.length; i++) {
+            const item = quote.items[i];
+            const itemRow = document.createElement('div');
+            itemRow.className = 'row mb-2 invoice-item-row';
+            itemRow.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" class="form-control item-description" placeholder="Item Description" value="${item.description}" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control item-quantity" placeholder="Qty" min="1" value="${item.quantity}" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" step="0.01" class="form-control item-price" placeholder="Unit Price" value="${item.price}" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" step="0.01" class="form-control item-total" placeholder="Total" value="${item.total}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger remove-item">×</button>
+                </div>
+            `;
+            document.getElementById('invoiceItems').appendChild(itemRow);
+            
+            // Add event listeners to the new item row
+            itemRow.querySelector('.item-quantity').addEventListener('input', calculateInvoiceTotals);
+            itemRow.querySelector('.item-price').addEventListener('input', calculateInvoiceTotals);
+            itemRow.querySelector('.remove-item').addEventListener('click', function() {
+                itemRow.remove();
+                calculateInvoiceTotals();
+            });
+        }
+    }
+    
+    // Set tax rate
+    document.getElementById('invoiceTaxRate').value = quote.taxRate || 0;
+    
+    // Calculate totals
+    calculateInvoiceTotals();
+    
+    // Set dates
+    const today = new Date();
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30); // Set due date to 30 days from now
+    
+    document.getElementById('invoiceDate').valueAsDate = today;
+    document.getElementById('invoiceDueDate').valueAsDate = dueDate;
+    
+    // Set notes
+    document.getElementById('invoiceNotes').value = quote.notes || '';
+    
+    // Set the form data attribute for the quote ID
+    document.getElementById('createInvoiceForm').setAttribute('data-quote-id', quoteId);
+}

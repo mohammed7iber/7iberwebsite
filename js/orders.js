@@ -228,3 +228,30 @@ function populateOrderDropdowns() {
         }
     });
 }
+
+// Add material price lookup when creating orders
+document.addEventListener('DOMContentLoaded', function() {
+    // When client and material are selected, look up pricing
+    const orderClientSelect = document.getElementById('orderClient');
+    const materialSelect = document.getElementById('printMaterial');
+    
+    if (orderClientSelect && materialSelect) {
+        materialSelect.addEventListener('change', function() {
+            const clientId = orderClientSelect.value;
+            const material = this.value;
+            
+            if (clientId && material && typeof getClientPrice === 'function') {
+                const pricing = getClientPrice(clientId, material);
+                if (pricing) {
+                    // Display pricing information in a new field or alert
+                    alert(`Client pricing found: ${formatCurrency(pricing.unitPrice)} ${pricing.pricingMethod}`);
+                    
+                    // You could also update a visible field with this information
+                    // For example:
+                    // document.getElementById('materialPriceInfo').textContent = 
+                    //    `Price: ${formatCurrency(pricing.unitPrice)} ${pricing.pricingMethod}`;
+                }
+            }
+        });
+    }
+});

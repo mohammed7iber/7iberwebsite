@@ -308,3 +308,58 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Continue with the rest of initialization...
 });
+
+// Add Price List Button to the navigation
+document.addEventListener('DOMContentLoaded', function() {
+    // Add button to manage clients page
+    const clientsSection = document.getElementById('clients');
+    if (clientsSection) {
+        const header = clientsSection.querySelector('h2');
+        if (header) {
+            // Create a container for the buttons if not already present
+            let buttonContainer = clientsSection.querySelector('.client-action-buttons');
+            if (!buttonContainer) {
+                buttonContainer = document.createElement('div');
+                buttonContainer.className = 'client-action-buttons d-flex mb-3';
+                header.parentNode.insertBefore(buttonContainer, header.nextSibling);
+            }
+            
+            // Add the existing "Add Client" button to the container if it's not there
+            const existingAddButton = clientsSection.querySelector('.btn-primary');
+            if (existingAddButton && existingAddButton.parentNode !== buttonContainer) {
+                buttonContainer.appendChild(existingAddButton);
+            }
+            
+            // Create and add the "Manage Price Lists" button
+            const priceListBtn = document.createElement('button');
+            priceListBtn.className = 'btn btn-info ms-2';
+            priceListBtn.innerHTML = '<i class="bi bi-tag"></i> Manage Price Lists';
+            priceListBtn.addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('priceListModal'));
+                modal.show();
+            });
+            
+            buttonContainer.appendChild(priceListBtn);
+        }
+    }
+    
+    // Add a standalone Price Lists button in the sidebar (optional)
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        const settingsLink = sidebar.querySelector('a[data-section="settings"]');
+        if (settingsLink) {
+            const priceListLink = document.createElement('a');
+            priceListLink.href = '#';
+            priceListLink.innerHTML = 'Price Lists';
+            priceListLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = new bootstrap.Modal(document.getElementById('priceListModal'));
+                modal.show();
+            });
+            
+            // Insert before settings
+            sidebar.insertBefore(priceListLink, settingsLink);
+        }
+    }
+});
+
