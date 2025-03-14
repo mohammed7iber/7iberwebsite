@@ -333,14 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 buttonContainer.appendChild(existingAddButton);
             }
             
-            // Create and add the "Manage Price Lists" button
-            const priceListBtn = document.createElement('button');
-            priceListBtn.className = 'btn btn-info ms-2';
-            priceListBtn.innerHTML = '<i class="bi bi-tag"></i> Manage Price Lists';
-            priceListBtn.addEventListener('click', function() {
-                const modal = new bootstrap.Modal(document.getElementById('priceListModal'));
-                modal.show();
-            });
+
             
             buttonContainer.appendChild(priceListBtn);
         }
