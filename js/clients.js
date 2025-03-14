@@ -635,8 +635,12 @@ function removeBranch(branchId) {
                         if (branch) {
                             if (!branch.printLocations) branch.printLocations = [];
                             
-                            // Update or add the location
-                            const locationIndex = branch.printLocations.findIndex(loc => loc.id === locationId);
+                            // Filter out any null entries and then find the index
+                            branch.printLocations = branch.printLocations.filter(loc => loc != null);
+                            
+                            // Now find the index safely
+                            const locationIndex = branch.printLocations.findIndex(loc => loc && loc.id === locationId);
+                            
                             if (locationIndex !== -1) {
                                 // Update existing location
                                 branch.printLocations[locationIndex] = locationData;
