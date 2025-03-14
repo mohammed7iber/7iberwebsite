@@ -255,3 +255,131 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// When a client is selected, populate material options from print locations
+document.addEventListener('DOMContentLoaded', function() {
+    const orderClientSelect = document.getElementById('orderClient');
+    const materialSelect = document.getElementById('printMaterial');
+    
+    if (orderClientSelect && materialSelect) {
+        orderClientSelect.addEventListener('change', function() {
+            const clientId = this.value;
+            if (!clientId) return;
+            
+            // Find the client
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+            
+            // Collect all unique materials from all print locations across all branches
+            const uniqueMaterials = new Set();
+            
+            if (client.branches) {
+                client.branches.forEach(branch => {
+                    if (branch.printLocations) {
+                        branch.printLocations.forEach(location => {
+                            if (location.material) {
+                                uniqueMaterials.add(location.material);
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Save current selection if possible
+            const currentSelection = materialSelect.value;
+            
+            // Clear material options except for the first empty option
+            while (materialSelect.options.length > 1) {
+                materialSelect.options.remove(1);
+            }
+            
+            // Add collected materials as options
+            const sortedMaterials = Array.from(uniqueMaterials).sort();
+            sortedMaterials.forEach(material => {
+                const option = document.createElement('option');
+                option.value = material;
+                option.textContent = material;
+                materialSelect.appendChild(option);
+            });
+            
+            // Add "Other" option at the end
+            const otherOption = document.createElement('option');
+            otherOption.value = "Other";
+            otherOption.textContent = "Other";
+            materialSelect.appendChild(otherOption);
+            
+            // Restore selection if it exists in the new options
+            if (currentSelection && Array.from(materialSelect.options).some(opt => opt.value === currentSelection)) {
+                materialSelect.value = currentSelection;
+            }
+        });
+        
+        // Add event listener to material selection to filter print locations
+        materialSelect.addEventListener('change', function() {
+            const clientId = orderClientSelect.value;
+            const material = this.value;
+            
+            // We can optionally add code here to suggest dimensions based on available print locations
+            // that use the selected material
+            
+            // For example, we could add a new field to display compatible print locations:
+            const infoDiv = document.getElementById('compatibleLocationsInfo') || document.createElement('div');
+            if (!document.getElementById('compatibleLocationsInfo')) {
+                infoDiv.id = 'compatibleLocationsInfo';
+                infoDiv.className = 'alert alert-info mt-3';
+                // Insert after the material select
+                materialSelect.parentNode.parentNode.after(infoDiv);
+            }
+            
+            if (clientId && material && material !== 'Other') {
+                // Find the client
+                const client = clients.find(c => c.id === clientId);
+                if (!client) return;
+                
+                // Find compatible print locations
+                const compatibleLocations = [];
+                
+                if (client.branches) {
+                    client.branches.forEach(branch => {
+                        if (branch.printLocations) {
+                            branch.printLocations.forEach(location => {
+                                if (location.material === material) {
+                                    compatibleLocations.push({
+                                        branch: branch.name,
+                                        location: location.name,
+                                        dimensions: {
+                                            inner: `${location.dimensions.innerWidth || 0} × ${location.dimensions.innerHeight || 0} × ${location.dimensions.innerDepth || 0} ${location.dimensions.widthUnit || 'in'}`,
+                                            outer: `${location.dimensions.outerWidth || 0} × ${location.dimensions.outerHeight || 0} × ${location.dimensions.outerDepth || 0} ${location.dimensions.widthUnit || 'in'}`
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                // Display compatible locations
+                if (compatibleLocations.length > 0) {
+                    let locationsHtml = '<p><strong>Compatible print locations:</strong></p><ul>';
+                    compatibleLocations.forEach(loc => {
+                        locationsHtml += `
+                            <li>
+                                <strong>${loc.branch}</strong>: ${loc.location}<br>
+                                <small>Inner: ${loc.dimensions.inner} | Outer: ${loc.dimensions.outer}</small>
+                            </li>
+                        `;
+                    });
+                    locationsHtml += '</ul>';
+                    
+                    infoDiv.innerHTML = locationsHtml;
+                    infoDiv.style.display = 'block';
+                } else {
+                    infoDiv.innerHTML = `<p>No print locations found that use ${material}. You may need to create a new print location.</p>`;
+                    infoDiv.style.display = 'block';
+                }
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        });
+    }
+});

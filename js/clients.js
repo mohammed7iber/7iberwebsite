@@ -148,6 +148,25 @@ function viewClient(clientId) {
                 </div>
             `;
         });
+            // When creating the locations HTML, include material:
+    if (branch.printLocations && branch.printLocations.length > 0) {
+        branch.printLocations.forEach(location => {
+            const materialText = location.material || 'Not specified';
+                
+            locationsHtml += `
+                <div class="ps-4 mb-2">
+                    <strong>${location.name}</strong> - ${location.description || ''}
+                    <br>
+                    <small>
+                        Inner: ${formatDimensions(/*...*/)}
+                        | Outer: ${formatDimensions(/*...*/)}
+                        <br>
+                        <strong>Material:</strong> ${materialText}
+                    </small>
+                </div>
+            `;
+        });
+    }
     } else {
         branchesHtml = '<p><em>No branches added</em></p>';
     }
@@ -558,14 +577,16 @@ function removeBranch(branchId) {
         const savePrintLocationBtn = document.getElementById('savePrintLocationBtn');
         if (savePrintLocationBtn) {
             savePrintLocationBtn.addEventListener('click', function() {
-                const locationId = document.getElementById('printLocationId').value || generateId();
-                const branchId = document.getElementById('printLocationBranchId').value;
+                // Existing code to get location ID, branch ID, etc.
                 
-                // Get image data if uploaded
-                let imageUrl = '';
-                const imagePreview = document.getElementById('imagePreview');
-                if (imagePreview && !document.getElementById('imagePreviewContainer').classList.contains('d-none')) {
-                    imageUrl = imagePreview.src;
+                // Get selected material
+                let material = document.getElementById('printLocationMaterial').value;
+                if (material === 'Other') {
+                    // Use the specified other material
+                    const otherMaterial = document.getElementById('otherMaterialText').value.trim();
+                    if (otherMaterial) {
+                        material = otherMaterial;
+                    }
                 }
                 
                 // Create location data object
@@ -585,6 +606,7 @@ function removeBranch(branchId) {
                         heightUnit: document.getElementById('heightUnit').value,
                         depthUnit: document.getElementById('depthUnit').value
                     },
+                    material: material, // Add single material to the object
                     imageUrl: imageUrl
                 };
                 
@@ -710,7 +732,12 @@ function removeBranch(branchId) {
         
         locationElement.querySelector('.inner-dimensions').textContent = innerDimensions;
         locationElement.querySelector('.outer-dimensions').textContent = outerDimensions;
-        
+       
+        // Update material
+        const materialElement = locationElement.querySelector('.location-material');
+        if (materialElement) {
+            materialElement.textContent = locationData.material || 'Not specified';
+        }
         // Handle image
         const imageElement = locationElement.querySelector('.location-image');
         const noImageText = locationElement.querySelector('.no-image-text');
@@ -783,7 +810,7 @@ function removeBranch(branchId) {
             }
         }
         
-        if (locationData) {
+        if (locationData) { 
             // Set the form fields
             document.getElementById('printLocationId').value = locationData.id;
             document.getElementById('printLocationBranchId').value = branchId;
@@ -791,6 +818,33 @@ function removeBranch(branchId) {
             document.getElementById('printLocationDescription').value = locationData.description || '';
             document.getElementById('printLocationNotes').value = locationData.notes || '';
             
+            // Set material
+            const materialSelect = document.getElementById('printLocationMaterial');
+            const otherMaterialContainer = document.getElementById('otherMaterialContainer');
+            const otherMaterialText = document.getElementById('otherMaterialText');
+            
+            if (materialSelect && locationData.material) {
+                // Check if the material is in our predefined list
+                const materialExists = Array.from(materialSelect.options).some(
+                    option => option.value === locationData.material && option.value !== 'Other'
+                );
+                
+                if (materialExists) {
+                    materialSelect.value = locationData.material;
+                    otherMaterialContainer.style.display = 'none';
+                    otherMaterialText.value = '';
+                } else {
+                    // Material is not in predefined list, use "Other"
+                    materialSelect.value = 'Other';
+                    otherMaterialContainer.style.display = 'block';
+                    otherMaterialText.value = locationData.material;
+                }
+            } else {
+                // No material set
+                materialSelect.value = '';
+                otherMaterialContainer.style.display = 'none';
+                otherMaterialText.value = '';
+            }               
             // Set dimensions
             document.getElementById('innerWidth').value = locationData.dimensions.innerWidth || '';
             document.getElementById('innerHeight').value = locationData.dimensions.innerHeight || '';
@@ -872,6 +926,32 @@ function removeBranch(branchId) {
         });
     }
     
+    // Initialize material selection dropdown for print locations
+function initMaterialSelection() {
+    // Handle the "Other" material option
+    const materialSelect = document.getElementById('printLocationMaterial');
+    const otherMaterialContainer = document.getElementById('otherMaterialContainer');
+    
+    if (materialSelect && otherMaterialContainer) {
+        materialSelect.addEventListener('change', function() {
+            otherMaterialContainer.style.display = this.value === 'Other' ? 'block' : 'none';
+        });
+    }
+}
+
+// Call this when initializing print location management
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize other components
+    
+    // Add material selection initialization
+    const printLocationModal = document.getElementById('printLocationModal');
+    if (printLocationModal) {
+        printLocationModal.addEventListener('shown.bs.modal', function() {
+            initMaterialSelection();
+        });
+    }
+});
+
     // Add event listeners when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize client modals and branch management

@@ -482,6 +482,58 @@
                         <textarea class="form-control" id="printLocationDescription" rows="2"></textarea>
                     </div>
                     
+                    <div class="mb-3 mt-3">
+                        <label for="printLocationMaterial" class="form-label">Material</label>
+                        <select class="form-select" id="printLocationMaterial" required>
+                            <option value="BACK-LIT">BACK-LIT</option>
+                            <option value="BANNER ">BANNER </option>
+                            <option value="BANNER DOUBLE FACE">BANNER DOUBLE FACE</option>
+                            <option value="BOX 100">BOX 100</option>
+                            <option value="BOX 76">BOX 76</option>
+                            <option value="BOX STICKERS ONLY">BOX STICKERS ONLY</option>
+                            <option value="CARTON DOUBLE SIDES">CARTON DOUBLE SIDES</option>
+                            <option value="CORRUGATED CARD BOARD">CORRUGATED CARD BOARD</option>
+                            <option value="FABRIC LIGHTBOX">FABRIC LIGHTBOX</option>
+                            <option value="FLEX">FLEX</option>
+                            <option value="FOAM + STICKER">FOAM + STICKER</option>
+                            <option value="FOAM + STICKER 10MM">FOAM + STICKER 10MM</option>
+                            <option value="FOAM + STICKER 10MM DOUBLE FACE">FOAM + STICKER 10MM DOUBLE FACE</option>
+                            <option value="FOAM + STICKER 3MM">FOAM + STICKER 3MM</option>
+                            <option value="FOAM + STICKER 5MM">FOAM + STICKER 5MM</option>
+                            <option value="FOAM + STICKER 5MM DOUBLE FACE">FOAM + STICKER 5MM DOUBLE FACE</option>
+                            <option value="FOAM + STICKER DOUBLE">FOAM + STICKER DOUBLE</option>
+                            <option value="FOREX 1MM">FOREX 1MM</option>
+                            <option value="FOREX 2MM">FOREX 2MM</option>
+                            <option value="FOREX 2MM DOUBLE FACE">FOREX 2MM DOUBLE FACE</option>
+                            <option value="FOREX 3MM">FOREX 3MM</option>
+                            <option value="FOREX 3MM DOUBLE FACE">FOREX 3MM DOUBLE FACE</option>
+                            <option value="FOREX 5MM">FOREX 5MM</option>
+                            <option value="FOREX 5MM DOUBLE FACE">FOREX 5MM DOUBLE FACE</option>
+                            <option value="POSTER">POSTER</option>
+                            <option value="POSTER  + CUT">POSTER  + CUT</option>
+                            <option value="POSTER DF">POSTER DF</option>
+                            <option value="POSTER RECYCLED PAPER">POSTER RECYCLED PAPER</option>
+                            <option value="POSTER RECYCLED PAPER + CUT">POSTER RECYCLED PAPER + CUT</option>
+                            <option value="POSTER RECYCLED PAPER DF">POSTER RECYCLED PAPER DF</option>
+                            <option value="PVC + STICKERS">PVC + STICKERS</option>
+                            <option value="ROLLUP + MACHINE">ROLLUP + MACHINE</option>
+                            <option value="ROLLUP + WITHOUT MACHINE">ROLLUP + WITHOUT MACHINE</option>
+                            <option value="SECURITY PANNEL">SECURITY PANNEL</option>
+                            <option value="SELF STAND A5">SELF STAND A5</option>
+                            <option value="STICKER">STICKER</option>
+                            <option value="STICKER + CUT">STICKER + CUT</option>
+                            <option value="STICKER + LAMINATION">STICKER + LAMINATION</option>
+                            <option value="STICKER + LAMINATION + CUT">STICKER + LAMINATION + CUT</option>
+                            <option value="STRECH FABRIC">STRECH FABRIC</option>
+                            <option value="UV PRINTING ">UV PRINTING </option>
+                            <option value="Other">Other (specify)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="otherMaterialContainer" style="display: none;">
+                        <label for="otherMaterialText" class="form-label">Specify Material</label>
+                        <input type="text" class="form-control" id="otherMaterialText" placeholder="Enter material name">
+                    </div>
+                    
                     <h5 class="mt-4">Dimensions</h5>
                     <div class="row">
                         <div class="col-md-6">
@@ -607,6 +659,7 @@
 </div>
 
 <!-- Print Location Card Template -->
+<!-- Update the Print Location Card Template to include single material -->
 <template id="printLocationTemplate">
     <div class="card mb-2 print-location-item" data-location-id="">
         <div class="card-header py-2 d-flex justify-content-between align-items-center">
@@ -624,6 +677,11 @@
                         <strong>Inner:</strong> <span class="inner-dimensions">0 x 0 x 0</span><br>
                         <strong>Outer:</strong> <span class="outer-dimensions">0 x 0 x 0</span>
                     </small>
+                    <div class="mt-1">
+                        <small>
+                            <strong>Material:</strong> <span class="location-material">Not specified</span>
+                        </small>
+                    </div>
                 </div>
                 <div class="col-md-6 text-center">
                     <img class="location-image img-fluid img-thumbnail" src="" alt="Location image" style="max-height: 100px; display: none;">
