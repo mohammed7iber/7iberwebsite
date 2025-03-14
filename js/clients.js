@@ -447,7 +447,9 @@ function removeBranch(branchId) {
         const branches = [];
         document.querySelectorAll('.branch-item').forEach(branchElement => {
             const branchId = branchElement.getAttribute('data-branch-id');
-            
+
+            console.log(`Checking print locations for branch ${branchId}`);
+
             // Create branch object
             const branch = {
                 id: branchId,
@@ -587,13 +589,16 @@ function removeBranch(branchId) {
                     imageUrl = imagePreview.src;
                 }
                 
-                // Get selected material
+                // Get selected material and log it for debugging
                 let material = document.getElementById('printLocationMaterial').value;
+                console.log("Selected material:", material);
+                
                 if (material === 'Other') {
                     // Use the specified other material
                     const otherMaterial = document.getElementById('otherMaterialText').value.trim();
                     if (otherMaterial) {
                         material = otherMaterial;
+                        console.log("Using other material:", material);
                     }
                 }
                 
@@ -617,6 +622,8 @@ function removeBranch(branchId) {
                     material: material, // Add single material to the object
                     imageUrl: imageUrl
                 };
+                
+                console.log("Location data being saved:", locationData);
       
                 
             // Find the branch container to add the location
@@ -745,7 +752,9 @@ function removeBranch(branchId) {
         // Update material
         const materialElement = locationElement.querySelector('.location-material');
         if (materialElement) {
-            materialElement.textContent = locationData.material || 'Not specified';
+            const materialText = locationData.material || 'Not specified';
+            console.log(`Setting material text to: ${materialText}`);
+            materialElement.textContent = materialText;
         }
         // Handle image
         const imageElement = locationElement.querySelector('.location-image');
@@ -772,8 +781,20 @@ function removeBranch(branchId) {
             const client = clients.find(c => c.id === clientId);
             if (client && client.branches) {
                 const branch = client.branches.find(b => b.id === branchId);
-                if (branch && branch.printLocations) {
-                    locationData = branch.printLocations.find(l => l.id === locationId);
+                if (branch) {
+                    if (!branch.printLocations) branch.printLocations = [];
+                    
+                    // Update or add the location
+                    const locationIndex = branch.printLocations.findIndex(loc => loc.id === locationId);
+                    if (locationIndex !== -1) {
+                        // Update existing location
+                        branch.printLocations[locationIndex] = locationData;
+                    } else {
+                        // Add new location
+                        branch.printLocations.push(locationData);
+                    }
+                    
+                    console.log("Updated branch print locations:", branch.printLocations);
                 }
             }
         }
@@ -797,6 +818,7 @@ function removeBranch(branchId) {
                     const unit = unitMatch ? unitMatch[0] : 'in';
                     
                     locationData = {
+
                         id: locationId,
                         name: locationElement.querySelector('.location-name').textContent,
                         description: descriptionText === 'No description' ? '' : descriptionText,
@@ -812,6 +834,7 @@ function removeBranch(branchId) {
                             heightUnit: unit,
                             depthUnit: unit
                         },
+                        material: material, // Add single material to the object
                         imageUrl: locationElement.querySelector('.location-image').style.display !== 'none' ? 
                             locationElement.querySelector('.location-image').src : ''
                     };
