@@ -858,7 +858,6 @@ function removeBranch(branchId) {
                             heightUnit: unit,
                             depthUnit: unit
                         },
-                        material: material, // Add single material to the object
                         imageUrl: locationElement.querySelector('.location-image').style.display !== 'none' ? 
                             locationElement.querySelector('.location-image').src : ''
                     };
