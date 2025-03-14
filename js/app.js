@@ -256,3 +256,55 @@ function loadSettings() {
         });
     }
 }
+
+// Add this to your app.js file near the beginning
+
+// Function to migrate existing clients to new structure with branches
+function migrateClientsToNewStructure() {
+    // Get existing clients
+    const existingClients = JSON.parse(localStorage.getItem(CLIENTS_KEY)) || [];
+    
+    // Check if migration is needed (if first client doesn't have branches property)
+    if (existingClients.length > 0 && !existingClients[0].hasOwnProperty('branches')) {
+        console.log('Migrating clients to new structure with branches and print locations...');
+        
+        // Migrate each client to new structure
+        const updatedClients = existingClients.map(client => {
+            // Create a default branch with the existing location info
+            const defaultBranch = {
+                id: generateId(),
+                name: "Main Branch",
+                location: client.location || "",
+                contactPerson: client.contactPerson || "",
+                phone: client.phone || "",
+                email: client.email || "",
+                notes: "",
+                printLocations: []
+            };
+            
+            // Return updated client structure
+            return {
+                ...client,
+                branches: [defaultBranch]
+            };
+        });
+        
+        // Save updated clients
+        localStorage.setItem(CLIENTS_KEY, JSON.stringify(updatedClients));
+        console.log('Client migration complete.');
+        
+        return updatedClients;
+    }
+    
+    return existingClients;
+}
+
+// Call this function when the application starts
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing code...
+    
+    // Migrate clients to new structure if needed
+    clients = migrateClientsToNewStructure();
+    
+    // Continue with the rest of initialization...
+});

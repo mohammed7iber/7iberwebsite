@@ -278,49 +278,330 @@
     </div>
     
     <!-- Add Client Modal -->
-    <div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Client</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Replace your existing client modal with this enhanced version -->
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add/Edit Client</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addClientForm">
+                    <ul class="nav nav-tabs" id="clientTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="client-info-tab" data-bs-toggle="tab" 
+                                data-bs-target="#client-info" type="button" role="tab" 
+                                aria-controls="client-info" aria-selected="true">Client Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="branches-tab" data-bs-toggle="tab" 
+                                data-bs-target="#branches" type="button" role="tab" 
+                                aria-controls="branches" aria-selected="false">Branches</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content pt-3" id="clientTabContent">
+                        <!-- Client Info Tab -->
+                        <div class="tab-pane fade show active" id="client-info" role="tabpanel" aria-labelledby="client-info-tab">
+                            <div class="mb-3">
+                                <label for="clientName" class="form-label">Client Name/Company</label>
+                                <input type="text" class="form-control" id="clientName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactPerson" class="form-label">Main Contact Person</label>
+                                <input type="text" class="form-control" id="contactPerson">
+                            </div>
+                            <div class="mb-3">
+                                <label for="clientEmail" class="form-label">Main Email</label>
+                                <input type="email" class="form-control" id="clientEmail">
+                            </div>
+                            <div class="mb-3">
+                                <label for="clientPhone" class="form-label">Main Phone</label>
+                                <input type="text" class="form-control" id="clientPhone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="clientNotes" class="form-label">Client Notes</label>
+                                <textarea class="form-control" id="clientNotes" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Branches Tab -->
+                        <div class="tab-pane fade" id="branches" role="tabpanel" aria-labelledby="branches-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Client Branches</h5>
+                                <button type="button" class="btn btn-sm btn-primary" id="addBranchBtn">
+                                    <i class="bi bi-plus"></i> Add Branch
+                                </button>
+                            </div>
+                            
+                            <div id="branchesList">
+                                <!-- Branch items will be added here dynamically -->
+                                <div class="alert alert-info">Add your first branch using the button above.</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this modal to your index.html file after the client modal -->
+<div class="modal fade" id="editBranchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBranchForm">
+                    <input type="hidden" id="branchId">
+                    <div class="mb-3">
+                        <label for="branchName" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="branchName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="branchLocation" class="form-label">Location/Address</label>
+                        <textarea class="form-control" id="branchLocation" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="branchContact" class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="branchContact">
+                    </div>
+                    <div class="mb-3">
+                        <label for="branchPhone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="branchPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="branchEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="branchEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label for="branchNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="branchNotes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveBranchBtn">Save Branch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Branch Template (will be used to create branch cards via JavaScript) -->
+<template id="branchTemplate">
+    <div class="card mb-3 branch-item" data-branch-id="">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 branch-name">Branch Name</h6>
+            <div>
+                <button type="button" class="btn btn-sm btn-warning edit-branch-btn">Edit</button>
+                <button type="button" class="btn btn-sm btn-danger remove-branch-btn">Remove</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Location:</strong> <span class="branch-location"></span>
                 </div>
-                <div class="modal-body">
-                    <form id="addClientForm">
-                        <div class="mb-3">
-                            <label for="clientName" class="form-label">Client Name/Company</label>
-                            <input type="text" class="form-control" id="clientName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contactPerson" class="form-label">Contact Person</label>
-                            <input type="text" class="form-control" id="contactPerson">
-                        </div>
-                        <div class="mb-3">
-                            <label for="clientEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="clientEmail">
-                        </div>
-                        <div class="mb-3">
-                            <label for="clientPhone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="clientPhone">
-                        </div>
-                        <div class="mb-3">
-                            <label for="clientLocation" class="form-label">Location/Address</label>
-                            <textarea class="form-control" id="clientLocation" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="clientNotes" class="form-label">Notes</label>
-                            <textarea class="form-control" id="clientNotes" rows="3"></textarea>
-                        </div>
-                    </form>
+                <div class="col-md-6">
+                    <strong>Contact:</strong> <span class="branch-contact"></span>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <h6>Print Locations (<span class="print-locations-count">0</span>)</h6>
+                <button type="button" class="btn btn-sm btn-success add-print-location-btn">
+                    <i class="bi bi-plus"></i> Add Print Location
+                </button>
+            </div>
+            <div class="print-locations-list mt-2">
+                <!-- Print locations will be added here -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Add this modal to your index.html file after the branch modal -->
+<div class="modal fade" id="printLocationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add/Edit Print Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="printLocationForm">
+                    <input type="hidden" id="printLocationId">
+                    <input type="hidden" id="printLocationBranchId">
+                    
+                    <div class="mb-3">
+                        <label for="printLocationName" class="form-label">Location Name</label>
+                        <input type="text" class="form-control" id="printLocationName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="printLocationDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="printLocationDescription" rows="2"></textarea>
+                    </div>
+                    
+                    <h5 class="mt-4">Dimensions</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Inner Dimensions</h6>
+                            <div class="mb-3 row">
+                                <label for="innerWidth" class="col-sm-4 col-form-label">Width</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="innerWidth" step="0.01">
+                                        <select class="form-select" id="widthUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="innerHeight" class="col-sm-4 col-form-label">Height</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="innerHeight" step="0.01">
+                                        <select class="form-select" id="heightUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="innerDepth" class="col-sm-4 col-form-label">Depth</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="innerDepth" step="0.01">
+                                        <select class="form-select" id="depthUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Outer Dimensions</h6>
+                            <div class="mb-3 row">
+                                <label for="outerWidth" class="col-sm-4 col-form-label">Width</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="outerWidth" step="0.01">
+                                        <select class="form-select" id="outerWidthUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="outerHeight" class="col-sm-4 col-form-label">Height</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="outerHeight" step="0.01">
+                                        <select class="form-select" id="outerHeightUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="outerDepth" class="col-sm-4 col-form-label">Depth</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="outerDepth" step="0.01">
+                                        <select class="form-select" id="outerDepthUnit" style="max-width: 80px;">
+                                            <option value="in">in</option>
+                                            <option value="cm">cm</option>
+                                            <option value="mm">mm</option>
+                                            <option value="m">m</option>
+                                            <option value="ft">ft</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 mt-3">
+                        <label for="printLocationImage" class="form-label">Location Image</label>
+                        <input type="file" class="form-control" id="printLocationImage" accept="image/*">
+                        <div id="imagePreviewContainer" class="mt-2 d-none">
+                            <img id="imagePreview" class="img-fluid img-thumbnail" style="max-height: 200px;">
+                            <button type="button" class="btn btn-sm btn-danger mt-1" id="removeImageBtn">Remove Image</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="printLocationNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="printLocationNotes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="savePrintLocationBtn">Save Location</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Location Card Template -->
+<template id="printLocationTemplate">
+    <div class="card mb-2 print-location-item" data-location-id="">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 location-name">Location Name</h6>
+            <div>
+                <button type="button" class="btn btn-sm btn-warning edit-location-btn">Edit</button>
+                <button type="button" class="btn btn-sm btn-danger remove-location-btn">Remove</button>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1 location-description">Description text here</p>
+                    <small class="location-dimensions">
+                        <strong>Inner:</strong> <span class="inner-dimensions">0 x 0 x 0</span><br>
+                        <strong>Outer:</strong> <span class="outer-dimensions">0 x 0 x 0</span>
+                    </small>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img class="location-image img-fluid img-thumbnail" src="" alt="Location image" style="max-height: 100px; display: none;">
+                    <p class="no-image-text">No image available</p>
                 </div>
             </div>
         </div>
     </div>
-    
+</template>
+
     <!-- Add Order Modal -->
     <div class="modal fade" id="addOrderModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
