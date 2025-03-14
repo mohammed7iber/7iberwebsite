@@ -520,6 +520,7 @@ function removeBranch(branchId) {
                             heightUnit: unit,
                             depthUnit: unit
                         },
+                        material: material, // Add single material to the object
                         imageUrl: imageUrl
                     };
                     
@@ -589,9 +590,9 @@ function removeBranch(branchId) {
                     imageUrl = imagePreview.src;
                 }
                 
-                // Get selected material and log it for debugging
+                // Get selected material
                 let material = document.getElementById('printLocationMaterial').value;
-                console.log("Selected material:", material);
+                console.log("Selected material value:", material);
                 
                 if (material === 'Other') {
                     // Use the specified other material
@@ -602,7 +603,7 @@ function removeBranch(branchId) {
                     }
                 }
                 
-                // Create location data object (include material)
+                // Create location data object
                 const locationData = {
                     id: locationId,
                     name: document.getElementById('printLocationName').value,
@@ -619,45 +620,68 @@ function removeBranch(branchId) {
                         heightUnit: document.getElementById('heightUnit').value,
                         depthUnit: document.getElementById('depthUnit').value
                     },
-                    material: material, // Add single material to the object
+                    material: material,
                     imageUrl: imageUrl
                 };
                 
-                console.log("Location data being saved:", locationData);
-      
+                console.log("Location data to save:", locationData);
                 
-            // Find the branch container to add the location
-            const branchElement = document.querySelector(`.branch-item[data-branch-id="${branchId}"]`);
-            if (branchElement) {
-                const printLocationsContainer = branchElement.querySelector('.print-locations-list');
-                
-                // Check if we're editing an existing location
-                const existingLocationElement = printLocationsContainer.querySelector(`.print-location-item[data-location-id="${locationId}"]`);
-                
-                if (existingLocationElement) {
-                    // Update existing location
-                    updatePrintLocationUI(existingLocationElement, locationData);
-                } else {
-                    // Add new location
-                    addPrintLocationToUI(printLocationsContainer, locationData, branchId);
+                // When a client is being edited, remember to update the client's data structure directly
+                const clientId = document.getElementById('addClientForm').getAttribute('data-id');
+                if (clientId) {
+                    const client = clients.find(c => c.id === clientId);
+                    if (client && client.branches) {
+                        const branch = client.branches.find(b => b.id === branchId);
+                        if (branch) {
+                            if (!branch.printLocations) branch.printLocations = [];
+                            
+                            // Update or add the location
+                            const locationIndex = branch.printLocations.findIndex(loc => loc.id === locationId);
+                            if (locationIndex !== -1) {
+                                // Update existing location
+                                branch.printLocations[locationIndex] = locationData;
+                            } else {
+                                // Add new location
+                                branch.printLocations.push(locationData);
+                            }
+                            
+                            console.log("Updated branch print locations:", branch.printLocations);
+                        }
+                    }
                 }
                 
-                // Update location count in branch card
-                const countElement = branchElement.querySelector('.print-locations-count');
-                countElement.textContent = printLocationsContainer.querySelectorAll('.print-location-item').length;
-            }
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('printLocationModal'));
-            modal.hide();
-            
-            // Reset form
-            document.getElementById('printLocationForm').reset();
-            document.getElementById('imagePreviewContainer').classList.add('d-none');
-            document.getElementById('printLocationId').value = '';
-            document.getElementById('printLocationBranchId').value = '';
-        });
-    }
+                // Find the branch container to update UI
+                const branchElement = document.querySelector(`.branch-item[data-branch-id="${branchId}"]`);
+                if (branchElement) {
+                    const printLocationsContainer = branchElement.querySelector('.print-locations-list');
+                    
+                    // Check if we're editing an existing location
+                    const existingLocationElement = printLocationsContainer.querySelector(`.print-location-item[data-location-id="${locationId}"]`);
+                    
+                    if (existingLocationElement) {
+                        // Update existing location
+                        updatePrintLocationUI(existingLocationElement, locationData);
+                    } else {
+                        // Add new location
+                        addPrintLocationToUI(printLocationsContainer, locationData, branchId);
+                    }
+                    
+                    // Update location count in branch card
+                    const countElement = branchElement.querySelector('.print-locations-count');
+                    countElement.textContent = printLocationsContainer.querySelectorAll('.print-location-item').length;
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('printLocationModal'));
+                modal.hide();
+                
+                // Reset form
+                document.getElementById('printLocationForm').reset();
+                document.getElementById('imagePreviewContainer').classList.add('d-none');
+                document.getElementById('printLocationId').value = '';
+                document.getElementById('printLocationBranchId').value = '';
+            });
+        }
         
         // Image handling for print location
         const printLocationImage = document.getElementById('printLocationImage');
