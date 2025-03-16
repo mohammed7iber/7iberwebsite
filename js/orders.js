@@ -484,6 +484,46 @@ function viewAdvancedOrder(orderId) {
     
     const client = clients.find(c => c.id === order.clientId);
     
+    // Recalculate totals from location items
+    let recalculatedSubtotal = 0;
+    
+    // Create table rows for each location and calculate the actual subtotal
+    const locationRows = order.locations.map(location => {
+        // Determine if this is an area-based pricing
+        const isAreaBased = location.pricingMethod === 'Per Square Meter' || 
+                         location.pricingMethod === 'Per Square Foot';
+        
+        // Format area information if applicable
+        const areaInfo = isAreaBased && location.area ? 
+            ` (Area: ${location.area.toFixed(2)} m²)` : '';
+        
+        // Use the correct total price
+        const totalPrice = location.totalPrice !== undefined ? 
+            location.totalPrice : (location.price * location.quantity);
+        
+        // Add to subtotal
+        recalculatedSubtotal += totalPrice;
+        
+        return `
+            <tr>
+                <td>${location.branchName} - ${location.name}</td>
+                <td>${location.material || 'Not specified'}</td>
+                <td>${location.dimensions}${areaInfo}</td>
+                <td>${location.quantity}</td>
+                <td>${formatCurrency(location.price)} <small class="text-muted">${location.pricingMethod}</small></td>
+                <td>${formatCurrency(totalPrice)}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Round subtotal to 1 decimal place
+    recalculatedSubtotal = Math.round(recalculatedSubtotal * 10) / 10;
+    
+    // Calculate tax and total based on recalculated subtotal
+    const taxRate = 0.16; // 16% tax
+    const recalculatedTax = recalculatedSubtotal * taxRate;
+    const recalculatedTotal = recalculatedSubtotal + recalculatedTax;
+    
     // Create a modal to display the order details
     const modalContent = `
         <div class="modal" tabindex="-1" id="viewAdvOrderModal">
@@ -502,7 +542,7 @@ function viewAdvancedOrder(orderId) {
                                     <strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleDateString()}<br>
                                     <strong>Installation Date:</strong> ${order.installDate ? new Date(order.installDate).toLocaleDateString() : 'Not set'}<br>
                                     <strong>Status:</strong> <span class="badge bg-${getStatusColor(order.status)}">${order.status}</span><br>
-                                    <strong>Total:</strong> ${formatCurrency(order.total)}
+                                    <strong>Total:</strong> ${formatCurrency(recalculatedTotal)}
                                 </p>
                                 ${order.notes ? `<p><strong>Notes:</strong> ${order.notes}</p>` : ''}
                             </div>
@@ -525,43 +565,20 @@ function viewAdvancedOrder(orderId) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${order.locations.map(location => {
-                                        // Determine if this is an area-based pricing
-                                        const isAreaBased = location.pricingMethod === 'Per Square Meter' || 
-                                                         location.pricingMethod === 'Per Square Foot';
-                                        
-                                        // Format area information if applicable
-                                        const areaInfo = isAreaBased && location.area ? 
-                                            ` (Area: ${location.area.toFixed(2)} m²)` : '';
-                                        
-                                        // Use the correct total price
-                                        const totalPrice = location.totalPrice !== undefined ? 
-                                            location.totalPrice : (location.price * location.quantity);
-                                        
-                                        return `
-                                            <tr>
-                                                <td>${location.branchName} - ${location.name}</td>
-                                                <td>${location.material || 'Not specified'}</td>
-                                                <td>${location.dimensions}${areaInfo}</td>
-                                                <td>${location.quantity}</td>
-                                                <td>${formatCurrency(location.price)} <small class="text-muted">${location.pricingMethod}</small></td>
-                                                <td>${formatCurrency(totalPrice)}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
+                                    ${locationRows}
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="5" class="text-end"><strong>Subtotal:</strong></td>
-                                        <td>${formatCurrency(order.subtotal)}</td>
+                                        <td>${formatCurrency(recalculatedSubtotal)}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="5" class="text-end"><strong>Tax (16%):</strong></td>
-                                        <td>${formatCurrency(order.tax)}</td>
+                                        <td>${formatCurrency(recalculatedTax)}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="5" class="text-end"><strong>Total:</strong></td>
-                                        <td>${formatCurrency(order.total)}</td>
+                                        <td>${formatCurrency(recalculatedTotal)}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -591,8 +608,12 @@ function viewAdvancedOrder(orderId) {
         document.getElementById('viewAdvOrderModal').addEventListener('hidden.bs.modal', function() {
             document.body.removeChild(modalDiv);
         });
-        // Create quote from this order
-        createQuoteFromAdvancedOrder(order.id);
+        // Create quote from this order - also pass the recalculated values
+        createQuoteFromAdvancedOrder(order.id, {
+            subtotal: recalculatedSubtotal,
+            tax: recalculatedTax,
+            total: recalculatedTotal
+        });
     });
     
     // Remove the modal from DOM when closed
@@ -602,7 +623,7 @@ function viewAdvancedOrder(orderId) {
 }
 
 // Create quote from advanced order
-function createQuoteFromAdvancedOrder(orderId) {
+function createQuoteFromAdvancedOrder(orderId, recalculatedTotals = null) {
     const order = orders.find(o => o.id === orderId);
     if (!order || !order.locations) return;
     
@@ -635,18 +656,30 @@ function createQuoteFromAdvancedOrder(orderId) {
         };
     });
     
-    // Calculate correct subtotal from items
+    // Calculate correct subtotal from items unless we have recalculated values
     let subtotal = 0;
-    items.forEach(item => {
-        subtotal += item.total;
-    });
-    
-    // Round subtotal to 1 decimal place if needed
-    subtotal = Math.round(subtotal * 10) / 10;
+    if (recalculatedTotals && recalculatedTotals.subtotal !== undefined) {
+        subtotal = recalculatedTotals.subtotal;
+    } else {
+        // Calculate from items
+        items.forEach(item => {
+            subtotal += item.total;
+        });
+        // Round subtotal to 1 decimal place
+        subtotal = Math.round(subtotal * 10) / 10;
+    }
     
     const taxRate = 16; // 16% tax
-    const taxAmount = subtotal * (taxRate / 100);
-    const total = subtotal + taxAmount;
+    
+    // Use recalculated tax and total if available
+    let taxAmount, total;
+    if (recalculatedTotals && recalculatedTotals.tax !== undefined && recalculatedTotals.total !== undefined) {
+        taxAmount = recalculatedTotals.tax;
+        total = recalculatedTotals.total;
+    } else {
+        taxAmount = subtotal * (taxRate / 100);
+        total = subtotal + taxAmount;
+    }
     
     // Create the quote object
     const newQuote = {
@@ -678,6 +711,13 @@ function createQuoteFromAdvancedOrder(orderId) {
     // Update the order to link it to this quote
     order.quoteId = newQuote.id;
     order.updatedAt = new Date().toISOString();
+    
+    // Also update the order with the correct calculated totals if they differ
+    if (recalculatedTotals) {
+        order.subtotal = recalculatedTotals.subtotal;
+        order.tax = recalculatedTotals.tax;
+        order.total = recalculatedTotals.total;
+    }
     
     // Save updated orders
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
