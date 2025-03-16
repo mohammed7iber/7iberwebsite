@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Create and add the "Manage Price Lists" button
-            const priceListBtn = document.createElement('button');
+        /*   const priceListBtn = document.createElement('button');
             priceListBtn.className = 'btn btn-info ms-2';
             priceListBtn.innerHTML = '<i class="bi bi-tag"></i> Manage Price Lists';
             priceListBtn.addEventListener('click', function() {
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.show();
             });
             
-            buttonContainer.appendChild(priceListBtn);
+            buttonContainer.appendChild(priceListBtn);*/
         }
     }
     
