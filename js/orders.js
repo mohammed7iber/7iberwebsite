@@ -383,3 +383,307 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Add to orders.js to display advanced orders in the orders table
+
+// Update loadOrdersTable to handle advanced orders
+function loadOrdersTable() {
+    const tableBody = document.getElementById('ordersTableBody');
+    tableBody.innerHTML = '';
+    
+    orders.forEach(order => {
+        const tr = document.createElement('tr');
+        const client = clients.find(c => c.id === order.clientId);
+        
+        // Check if this is an advanced order (has locations property)
+        const isAdvancedOrder = order.locations && Array.isArray(order.locations);
+        
+        if (isAdvancedOrder) {
+            // This is an advanced order
+            const locationCount = order.locations.length;
+            const firstLocation = order.locations[0];
+            
+            tr.innerHTML = `
+                <td>${order.id.substr(0, 8)}</td>
+                <td>${client ? client.name : 'Unknown'}</td>
+                <td>${order.name} (${locationCount} locations)</td>
+                <td>Multiple locations</td>
+                <td><span class="badge bg-${getStatusColor(order.status)}">${order.status}</span></td>
+                <td>${order.installDate ? new Date(order.installDate).toLocaleDateString() : 'Not set'}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary view-adv-order" data-id="${order.id}">View</button>
+                    <button class="btn btn-sm btn-success create-quote" data-id="${order.id}">Quote</button>
+                    <button class="btn btn-sm btn-danger delete-order" data-id="${order.id}">Delete</button>
+                </td>
+            `;
+        } else {
+            // This is a regular order
+            tr.innerHTML = `
+                <td>${order.id.substr(0, 8)}</td>
+                <td>${client ? client.name : 'Unknown'}</td>
+                <td>${order.description}</td>
+                <td>${order.width}${order.widthUnit} × ${order.height}${order.heightUnit}</td>
+                <td><span class="badge bg-${getStatusColor(order.status)}">${order.status}</span></td>
+                <td>${new Date(order.dueDate).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary edit-order" data-id="${order.id}">Edit</button>
+                    <button class="btn btn-sm btn-success create-quote" data-id="${order.id}">Quote</button>
+                    <button class="btn btn-sm btn-danger delete-order" data-id="${order.id}">Delete</button>
+                </td>
+            `;
+        }
+        
+        tableBody.appendChild(tr);
+    });
+    
+    // Add event listeners to buttons
+    document.querySelectorAll('.edit-order').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            editOrder(orderId);
+        });
+    });
+    
+    document.querySelectorAll('.view-adv-order').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            viewAdvancedOrder(orderId);
+        });
+    });
+    
+    document.querySelectorAll('.create-quote').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            const order = orders.find(o => o.id === orderId);
+            
+            if (order && order.locations) {
+                // This is an advanced order
+                createQuoteFromAdvancedOrder(orderId);
+            } else {
+                // This is a regular order
+                createQuoteFromOrder(orderId);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.delete-order').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            deleteOrder(orderId);
+        });
+    });
+    
+    // Populate order dropdowns
+    populateOrderDropdowns();
+}
+
+// View advanced order
+function viewAdvancedOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order || !order.locations) return;
+    
+    const client = clients.find(c => c.id === order.clientId);
+    
+    // Create a modal to display the order details
+    const modalContent = `
+        <div class="modal" tabindex="-1" id="viewAdvOrderModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Order Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h5>${order.name}</h5>
+                                <p>
+                                    <strong>Client:</strong> ${client ? client.name : 'Unknown'}<br>
+                                    <strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleDateString()}<br>
+                                    <strong>Installation Date:</strong> ${order.installDate ? new Date(order.installDate).toLocaleDateString() : 'Not set'}<br>
+                                    <strong>
+                                    <strong>Status:</strong> <span class="badge bg-${getStatusColor(order.status)}">${order.status}</span><br>
+                                    <strong>Total:</strong> ${formatCurrency(order.total)}
+                                </p>
+                                ${order.notes ? `<p><strong>Notes:</strong> ${order.notes}</p>` : ''}
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-sm btn-success create-quote-from-adv" data-id="${order.id}">Create Quote</button>
+                            </div>
+                        </div>
+                        
+                        <h5 class="border-top pt-3">Ordered Locations</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Location</th>
+                                        <th>Material</th>
+                                        <th>Dimensions</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.locations.map(location => `
+                                        <tr>
+                                            <td>${location.branchName} - ${location.name}</td>
+                                            <td>${location.material || 'Not specified'}</td>
+                                            <td>${location.dimensions}</td>
+                                            <td>${location.quantity}</td>
+                                            <td>${formatCurrency(location.price)} <small class="text-muted">${location.pricingMethod}</small></td>
+                                            <td>${formatCurrency(location.price * location.quantity)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="5" class="text-end"><strong>Subtotal:</strong></td>
+                                        <td>${formatCurrency(order.subtotal)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-end"><strong>Tax (16%):</strong></td>
+                                        <td>${formatCurrency(order.tax)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                                        <td>${formatCurrency(order.total)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to the page
+    const modalDiv = document.createElement('div');
+    modalDiv.innerHTML = modalContent;
+    document.body.appendChild(modalDiv);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('viewAdvOrderModal'));
+    modal.show();
+    
+    // Add event listener to create quote button
+    document.querySelector('.create-quote-from-adv').addEventListener('click', function() {
+        modal.hide();
+        // Remove the modal from DOM after hidden
+        document.getElementById('viewAdvOrderModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalDiv);
+        });
+        // Create quote from this order
+        createQuoteFromAdvancedOrder(order.id);
+    });
+    
+    // Remove the modal from DOM when closed
+    document.getElementById('viewAdvOrderModal').addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(modalDiv);
+    });
+}
+
+// Create quote from advanced order
+function createQuoteFromAdvancedOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order || !order.locations) return;
+    
+    // Create quote items from order locations
+    const items = order.locations.map(location => {
+        return {
+            description: `${location.branchName} - ${location.name} (${location.material})`,
+            quantity: location.quantity,
+            price: location.price,
+            total: location.price * location.quantity
+        };
+    });
+    
+    // Create the quote object
+    const newQuote = {
+        id: generateId(),
+        clientId: order.clientId,
+        orderId: orderId,
+        items: items,
+        subtotal: order.subtotal,
+        taxRate: 16, // 16% tax
+        taxAmount: order.tax,
+        total: order.total,
+        notes: `Quote created from order: ${order.name}`,
+        validUntil: (() => {
+            const date = new Date();
+            date.setDate(date.getDate() + 30); // Valid for 30 days
+            return date.toISOString().split('T')[0];
+        })(),
+        status: 'Pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    // Add to quotes array
+    quotes.push(newQuote);
+    
+    // Save to localStorage
+    localStorage.setItem(QUOTES_KEY, JSON.stringify(quotes));
+    
+    // Update the order to link it to this quote
+    order.quoteId = newQuote.id;
+    order.updatedAt = new Date().toISOString();
+    
+    // Save updated orders
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    
+    // Show success message
+    alert('Quote has been created successfully!');
+    
+    // Open the quote for viewing/editing
+    viewQuote(newQuote.id);
+}
+
+
+// Add this code to your orders.js file or to a DOMContentLoaded event handler
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add button to open advanced order modal
+    const ordersSection = document.getElementById('orders');
+    if (ordersSection) {
+        const existingBtn = ordersSection.querySelector('button.btn-primary');
+        if (existingBtn) {
+            // Create advanced order button
+            const advOrderBtn = document.createElement('button');
+            advOrderBtn.className = 'btn btn-success mb-3 ms-2';
+            advOrderBtn.innerHTML = '<i class="bi bi-plus-circle"></i> Advanced Order';
+            advOrderBtn.addEventListener('click', function() {
+                // Reset form
+                const form = document.getElementById('advancedOrderForm');
+                if (form) form.reset();
+                
+                const locationsTable = document.getElementById('printLocationsTable');
+                if (locationsTable) locationsTable.innerHTML = '';
+                
+                const clientPrompt = document.getElementById('selectClientPrompt');
+                if (clientPrompt) clientPrompt.style.display = 'block';
+                
+                if (locationsTable) locationsTable.style.display = 'none';
+                
+                const summaryContainer = document.getElementById('orderSummaryContainer');
+                if (summaryContainer) summaryContainer.style.display = 'none';
+                
+                // Set default date
+                const orderDateField = document.getElementById('advOrderDate');
+                if (orderDateField) orderDateField.valueAsDate = new Date();
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('newAdvancedOrderModal'));
+                modal.show();
+            });
+            
+            // Insert after the existing button
+            existingBtn.parentNode.insertBefore(advOrderBtn, existingBtn.nextSibling);
+        }
+    }
+});

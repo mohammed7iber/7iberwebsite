@@ -1240,6 +1240,106 @@
         </div>
     </div>
 </div>
+
+<!-- Add this as a new modal or as a dedicated page -->
+<div class="modal fade" id="newAdvancedOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Advanced Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="advancedOrderForm">
+                    <!-- Order Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="advOrderName" class="form-label">Order Name</label>
+                                <input type="text" class="form-control" id="advOrderName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="advOrderClient" class="form-label">Client</label>
+                                <select class="form-select" id="advOrderClient" required>
+                                    <option value="">Select Client</option>
+                                    <!-- Will be populated with JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="advOrderDate" class="form-label">Order Date</label>
+                                <input type="date" class="form-control" id="advOrderDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="advInstallDate" class="form-label">Installation Date</label>
+                                <input type="date" class="form-control" id="advInstallDate">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="advOrderNotes" class="form-label">Order Notes</label>
+                        <textarea class="form-control" id="advOrderNotes" rows="2"></textarea>
+                    </div>
+                    
+                    <!-- Print Locations Selection -->
+                    <div id="printLocationsSelectionContainer" class="mt-4">
+                        <h5>Select Print Locations</h5>
+                        <div class="alert alert-info" id="selectClientPrompt">
+                            Please select a client to view available print locations.
+                        </div>
+                        
+                        <div id="printLocationsTable" style="display: none;">
+                            <!-- Branches and print locations will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="mt-4" id="orderSummaryContainer" style="display: none;">
+                        <h5>Order Summary</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Material</th>
+                                    <th>Dimensions</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderSummaryTableBody">
+                                <!-- Will be populated dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td id="orderSubtotal">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Tax (16%):</strong></td>
+                                    <td id="orderTax">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                                    <td id="orderTotal">0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="createQuoteFromSelectionBtn">Create Quote</button>
+                <button type="button" class="btn btn-primary" id="saveAdvancedOrderBtn">Save Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
         <!-- JavaScript Libraries -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
         
@@ -1250,7 +1350,9 @@
         <script src="js/orders.js"></script>
         <script src="js/quotes.js"></script>
         <script src="js/invoices.js"></script>
+        <script src="js/advanced-orders.js"></script>
 
+        
         <!-- Initialization Script -->
         <script>
             // Ensure DOM is loaded before initializing the application
