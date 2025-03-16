@@ -125,9 +125,18 @@ function loadClientPrintLocations(clientId) {
             const unitPrice = pricing ? pricing.unitPrice : 0;
             const pricingMethod = pricing ? pricing.pricingMethod : 'N/A';
             
-            // Format dimensions
-            const innerDimensions = `${location.dimensions.innerWidth || 0} × ${location.dimensions.innerHeight || 0} × ${location.dimensions.innerDepth || 0} ${location.dimensions.widthUnit || 'in'}`;
-            const outerDimensions = `${location.dimensions.outerWidth || 0} × ${location.dimensions.outerHeight || 0} × ${location.dimensions.outerDepth || 0} ${location.dimensions.widthUnit || 'in'}`;
+            // Store dimensions for calculations
+            const innerWidth = parseFloat(location.dimensions.innerWidth) || 0;
+            const innerHeight = parseFloat(location.dimensions.innerHeight) || 0;
+            const innerDepth = parseFloat(location.dimensions.innerDepth) || 0;
+            const widthUnit = location.dimensions.widthUnit || 'in';
+            
+            // Format dimensions for display
+            const innerDimensions = `${innerWidth} × ${innerHeight} × ${innerDepth} ${widthUnit}`;
+            const outerDimensions = `${location.dimensions.outerWidth || 0} × ${location.dimensions.outerHeight || 0} × ${location.dimensions.outerDepth || 0} ${widthUnit}`;
+            
+            // Calculate the area based on dimensions
+            let area = calculateArea(innerWidth, innerHeight, widthUnit);
             
             locationRow.innerHTML = `
                 <td>
@@ -161,6 +170,7 @@ function loadClientPrintLocations(clientId) {
                                data-pricing-method="${pricingMethod}"
                                data-location-id="${location.id}" 
                                data-branch-id="${branch.id}"
+                               data-area="${area.toFixed(2)}"
                                readonly>
                     </div>
                     <small class="text-muted">${pricingMethod}</small>
@@ -169,6 +179,28 @@ function loadClientPrintLocations(clientId) {
             
             locationsContainer.appendChild(locationRow);
         });
+        
+        // Add this helper function to calculate area based on dimensions and unit
+        function calculateArea(width, height, unit) {
+            // Convert to square meters or appropriate unit based on the pricing method
+            let area = width * height;
+            
+            // You can add unit conversion if needed
+            // For example, converting from inches to square meters
+            if (unit === 'in') {
+                // 1 square inch = 0.00064516 square meters
+                area = area * 0.00064516;
+            } else if (unit === 'cm') {
+                // 1 square cm = 0.0001 square meters
+                area = area * 0.0001;
+            } else if (unit === 'ft') {
+                // 1 square foot = 0.092903 square meters
+                area = area * 0.092903;
+            }
+            // If unit is already meters, no conversion needed
+            
+            return area;
+        }
         
         // Add event listener for "Select All" checkbox
         const selectAllCheckbox = document.querySelector(`#select-all-${branch.id}`);
@@ -237,19 +269,29 @@ function updateOrderSummary() {
     selectedLocations.forEach(location => {
         const row = document.createElement('tr');
         
-        // Calculate total for this location
-        const unitPrice = parseFloat(location.price) || 0;
-        const quantity = parseInt(location.quantity) || 1;
-        const total = unitPrice * quantity;
-        
+        // Use the pre-calculated total price that accounts for area
+        const total = location.totalPrice;
         subtotal += total;
+        
+        // For display purposes, calculate price per unit
+        let displayPrice = location.price;
+        if (location.pricingMethod === 'Per Square Meter' || location.pricingMethod === 'Per Square Foot') {
+            // Show the price per square unit
+            displayPrice = location.price;
+        }
+        
+        // Area info for display if relevant
+        let areaInfo = '';
+        if (location.pricingMethod === 'Per Square Meter' || location.pricingMethod === 'Per Square Foot') {
+            areaInfo = ` (Area: ${location.area.toFixed(2)} m²)`;
+        }
         
         row.innerHTML = `
             <td>${location.branchName} - ${location.name}</td>
             <td>${location.material || 'Not specified'}</td>
-            <td>${location.dimensions}</td>
-            <td>${quantity}</td>
-            <td>${formatCurrency(unitPrice)} <small class="text-muted">${location.pricingMethod}</small></td>
+            <td>${location.dimensions}${areaInfo}</td>
+            <td>${location.quantity}</td>
+            <td>${formatCurrency(displayPrice)} <small class="text-muted">${location.pricingMethod}</small></td>
             <td>${formatCurrency(total)}</td>
         `;
         
@@ -288,15 +330,30 @@ function getSelectedLocations() {
         const location = branch.printLocations.find(loc => loc.id === locationId);
         if (!location) return;
         
-        // Get quantity and price
+        // Get quantity, price and pricing method
         const quantityInput = document.querySelector(`.location-quantity[data-location-id="${locationId}"]`);
         const priceInput = document.querySelector(`.location-price[data-location-id="${locationId}"]`);
         
         if (!quantityInput || !priceInput) return;
         
         const quantity = parseInt(quantityInput.value) || 1;
-        const price = parseFloat(priceInput.value) || 0;
+        const baseUnitPrice = parseFloat(priceInput.value) || 0;
         const pricingMethod = priceInput.getAttribute('data-pricing-method') || 'N/A';
+        const area = parseFloat(priceInput.getAttribute('data-area')) || 1;
+        
+        // Calculate the actual price based on pricing method
+        let finalPrice = baseUnitPrice;
+        let totalForItem = 0;
+        
+        if (pricingMethod === 'Per Square Meter' || pricingMethod === 'Per Square Foot') {
+            // For area-based pricing, multiply unit price by area
+            totalForItem = (baseUnitPrice * area * quantity);
+            // Round to 1 decimal place
+            totalForItem = Math.round(totalForItem * 10) / 10;
+        } else {
+            // For per-item pricing, use the unit price directly
+            totalForItem = baseUnitPrice * quantity;
+        }
         
         // Format dimensions
         const dimensions = `${location.dimensions.innerWidth || 0} × ${location.dimensions.innerHeight || 0} × ${location.dimensions.innerDepth || 0} ${location.dimensions.widthUnit || 'in'}`;
@@ -309,8 +366,10 @@ function getSelectedLocations() {
             material: location.material || 'Not specified',
             dimensions: dimensions,
             quantity: quantity,
-            price: price,
+            price: baseUnitPrice,
             pricingMethod: pricingMethod,
+            area: area,
+            totalPrice: totalForItem,
             location: location  // Include the full location object for reference
         });
     });
