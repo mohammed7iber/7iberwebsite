@@ -398,11 +398,15 @@ function saveAdvancedOrder() {
         return;
     }
     
-    // Calculate totals
+    // Calculate totals from selected locations with correct area-based pricing
     let subtotal = 0;
     selectedLocations.forEach(location => {
-        subtotal += location.price * location.quantity;
+        // Make sure we use the totalPrice property which accounts for area calculations
+        subtotal += location.totalPrice;
     });
+    
+    // Round subtotal to 1 decimal place
+    subtotal = Math.round(subtotal * 10) / 10;
     
     const taxRate = 0.16; // 16% tax
     const tax = subtotal * taxRate;
@@ -416,7 +420,7 @@ function saveAdvancedOrder() {
         orderDate: orderDate,
         installDate: installDate || null,
         notes: orderNotes,
-        locations: selectedLocations,
+        locations: selectedLocations,  // This now includes the area and totalPrice properties
         subtotal: subtotal,
         tax: tax,
         total: total,

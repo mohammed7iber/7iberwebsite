@@ -285,7 +285,7 @@ function viewQuote(quoteId) {
     
     const client = clients.find(c => c.id === quote.clientId);
     
-    // Create a preview of the quote
+    // Create a preview of the quote with enhanced information
     const previewContent = document.getElementById('quotePreviewContent');
     
     // Format date for display
@@ -336,14 +336,27 @@ function viewQuote(quoteId) {
                             </tr>
                         </thead>
                         <tbody>
-                            ${quote.items.map(item => `
-                                <tr>
-                                    <td>${item.description}</td>
-                                    <td class="text-end">${item.quantity}</td>
-                                    <td class="text-end">${formatCurrency(item.price)}</td>
-                                    <td class="text-end">${formatCurrency(item.total)}</td>
-                                </tr>
-                            `).join('')}
+                            ${quote.items.map(item => {
+                                // Check if the item has dimensions and pricing method info
+                                const hasPricingInfo = item.pricingMethod && item.dimensions;
+                                
+                                // Prepare additional info for display
+                                let additionalInfo = '';
+                                if (hasPricingInfo) {
+                                    additionalInfo = `<br><small class="text-muted">
+                                        ${item.dimensions} | ${item.pricingMethod}
+                                    </small>`;
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td>${item.description}${additionalInfo}</td>
+                                        <td class="text-end">${item.quantity}</td>
+                                        <td class="text-end">${formatCurrency(item.price)}</td>
+                                        <td class="text-end">${formatCurrency(item.total)}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
                         </tbody>
                         <tfoot>
                             <tr>

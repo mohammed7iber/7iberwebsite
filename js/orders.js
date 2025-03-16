@@ -501,7 +501,6 @@ function viewAdvancedOrder(orderId) {
                                     <strong>Client:</strong> ${client ? client.name : 'Unknown'}<br>
                                     <strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleDateString()}<br>
                                     <strong>Installation Date:</strong> ${order.installDate ? new Date(order.installDate).toLocaleDateString() : 'Not set'}<br>
-                                    <strong>
                                     <strong>Status:</strong> <span class="badge bg-${getStatusColor(order.status)}">${order.status}</span><br>
                                     <strong>Total:</strong> ${formatCurrency(order.total)}
                                 </p>
@@ -526,16 +525,30 @@ function viewAdvancedOrder(orderId) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${order.locations.map(location => `
-                                        <tr>
-                                            <td>${location.branchName} - ${location.name}</td>
-                                            <td>${location.material || 'Not specified'}</td>
-                                            <td>${location.dimensions}</td>
-                                            <td>${location.quantity}</td>
-                                            <td>${formatCurrency(location.price)} <small class="text-muted">${location.pricingMethod}</small></td>
-                                            <td>${formatCurrency(location.price * location.quantity)}</td>
-                                        </tr>
-                                    `).join('')}
+                                    ${order.locations.map(location => {
+                                        // Determine if this is an area-based pricing
+                                        const isAreaBased = location.pricingMethod === 'Per Square Meter' || 
+                                                         location.pricingMethod === 'Per Square Foot';
+                                        
+                                        // Format area information if applicable
+                                        const areaInfo = isAreaBased && location.area ? 
+                                            ` (Area: ${location.area.toFixed(2)} m²)` : '';
+                                        
+                                        // Use the correct total price
+                                        const totalPrice = location.totalPrice !== undefined ? 
+                                            location.totalPrice : (location.price * location.quantity);
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${location.branchName} - ${location.name}</td>
+                                                <td>${location.material || 'Not specified'}</td>
+                                                <td>${location.dimensions}${areaInfo}</td>
+                                                <td>${location.quantity}</td>
+                                                <td>${formatCurrency(location.price)} <small class="text-muted">${location.pricingMethod}</small></td>
+                                                <td>${formatCurrency(totalPrice)}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -593,15 +606,47 @@ function createQuoteFromAdvancedOrder(orderId) {
     const order = orders.find(o => o.id === orderId);
     if (!order || !order.locations) return;
     
-    // Create quote items from order locations
+    // Create quote items from order locations with correct pricing
     const items = order.locations.map(location => {
+        // Use the totalPrice if available, otherwise calculate it
+        const totalPrice = location.totalPrice !== undefined ? 
+            location.totalPrice : (location.price * location.quantity);
+        
+        // Calculate the effective unit price (total divided by quantity)
+        const effectiveUnitPrice = (totalPrice / location.quantity).toFixed(3);
+        
+        // Add area info to description for area-based pricing
+        const isAreaBased = location.pricingMethod === 'Per Square Meter' || 
+                          location.pricingMethod === 'Per Square Foot';
+        
+        let description = `${location.branchName} - ${location.name} (${location.material})`;
+        if (isAreaBased && location.area) {
+            description += ` - Area: ${location.area.toFixed(2)} m²`;
+        }
+        
         return {
-            description: `${location.branchName} - ${location.name} (${location.material})`,
+            description: description,
             quantity: location.quantity,
-            price: location.price,
-            total: location.price * location.quantity
+            price: parseFloat(effectiveUnitPrice), // Store effective price per unit
+            total: totalPrice, // Use the correct total price
+            dimensions: location.dimensions,
+            pricingMethod: location.pricingMethod,
+            materialInfo: location.material || 'Not specified'
         };
     });
+    
+    // Calculate correct subtotal from items
+    let subtotal = 0;
+    items.forEach(item => {
+        subtotal += item.total;
+    });
+    
+    // Round subtotal to 1 decimal place if needed
+    subtotal = Math.round(subtotal * 10) / 10;
+    
+    const taxRate = 16; // 16% tax
+    const taxAmount = subtotal * (taxRate / 100);
+    const total = subtotal + taxAmount;
     
     // Create the quote object
     const newQuote = {
@@ -609,10 +654,10 @@ function createQuoteFromAdvancedOrder(orderId) {
         clientId: order.clientId,
         orderId: orderId,
         items: items,
-        subtotal: order.subtotal,
-        taxRate: 16, // 16% tax
-        taxAmount: order.tax,
-        total: order.total,
+        subtotal: subtotal,
+        taxRate: taxRate,
+        taxAmount: taxAmount,
+        total: total,
         notes: `Quote created from order: ${order.name}`,
         validUntil: (() => {
             const date = new Date();
